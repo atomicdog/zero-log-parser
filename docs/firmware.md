@@ -24,12 +24,16 @@ Payload sizes (bytes) declared by each firmware build.
 | `0x54` | `TorqueInfo` | — | — | — | 16 | 16 | 16 | 16 | 16 | 16 | 16 |
 | `0xFB` | `LogHeaderEntry` | 104 | 104 | 104 | 104 | 104 | 104 | 104 | 104 | 104 | 104 |
 
+Revisions are those of `75-08163`. `75-08383` has no 486 build; its 519 build is rev 22
+and its 611 build is rev 3. Sizes are the same.
+
 ### Older MBB firmware
 
 | Firmware | Difference |
 |---|---|
 | rev 6–11 | Log header 115 bytes, no `fw_build_num` |
-| rev 7–11 | `0x48` two chargers in one 98-byte entry; currents in mA |
+| rev 7–11 | `0x48` two chargers in one 98-byte entry |
+| rev ≤ 15 | `0x48`, `0x49` currents in mA |
 | rev 8–11 | `0x4E` 52 bytes |
 | rev ≤ 14 | `0x4C` 71 bytes, `0x4D` 83 bytes |
 | rev ≤ 24 | `0x46` byte `0x12` = single eligibility byte |
@@ -51,7 +55,8 @@ All BMU types not listed below have the same size in every build: see
 | `0x8D` | `BmsIsolationFaultSevereClr` | — | — | — | 4 | 4 | 4 | 4 | 4 | 4 | 4 |
 | `0xFB` | `LogHeaderEntry` | 112 | 112 | 112 | 112 | 112 | 112 | 112 | 112 | 112 | 112 |
 
-`75-08384` has no rev 3 / 486 build.
+Revisions are those of `75-08274`. `75-08384` has no 486 build; its 519 build is rev 4
+and its 611 build is rev 3. Sizes are the same.
 
 ### MY19 BMS (`75-08156`)
 

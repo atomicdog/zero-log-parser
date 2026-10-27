@@ -51,8 +51,8 @@
 | — | `0x25` | `0x25` | 4 | `s32` | `pack_voltage_mv` | Pack voltage, mV |
 | — | — | `0x29` | 1 | `u8` | `lowest_cell_index` | Lowest cell, 0–27. `0xFF` = unavailable |
 | — | — | `0x2A` | 1 | `u8` | `highest_cell_index` | Highest cell, 0–27. `0xFF` = unavailable |
-| `0x25` | `0x29` | `0x2B` | 1 | `s8` | `temp_board_c` | Minimum cell temperature, °C |
-| `0x26` | `0x2A` | `0x2C` | 1 | `s8` | `temp_ambient_c` | Maximum cell temperature, °C |
+| `0x25` | `0x29` | `0x2B` | 1 | `s8` | `min_cell_temp_c` | Minimum cell temperature, °C |
+| `0x26` | `0x2A` | `0x2C` | 1 | `s8` | `max_cell_temp_c` | Maximum cell temperature, °C |
 | `0x27` | `0x2B` | `0x2D` | 1 | `u8` | `soc_meas_disch_pct` | SOC from measured discharge vs ideal capacity, % |
 | `0x28` | `0x2C` | `0x2E` | 2 | `u16` | `max_disch_amps` | Maximum discharge current allowed, A |
 | `0x2A` | `0x2E` | `0x30` | 2 | `u16` | `max_chg_amps` | Maximum charge current allowed, A |
@@ -80,8 +80,8 @@
 | — | `0x29` | `0x29` | 4 | `s32` | `pack_voltage_mv` | Pack voltage, mV |
 | — | — | `0x2D` | 1 | `u8` | `lowest_cell_index` | Lowest cell, 0–27. `0xFF` = unavailable |
 | — | — | `0x2E` | 1 | `u8` | `highest_cell_index` | Highest cell, 0–27. `0xFF` = unavailable |
-| `0x29` | `0x2D` | `0x2F` | 1 | `s8` | `temp_board_c` | Minimum cell temperature, °C |
-| `0x2A` | `0x2E` | `0x30` | 1 | `s8` | `temp_ambient_c` | Maximum cell temperature, °C |
+| `0x29` | `0x2D` | `0x2F` | 1 | `s8` | `min_cell_temp_c` | Minimum cell temperature, °C |
+| `0x2A` | `0x2E` | `0x30` | 1 | `s8` | `max_cell_temp_c` | Maximum cell temperature, °C |
 | `0x2B` | `0x2F` | `0x31` | 1 | `u8` | `soc_meas_disch_pct` | SOC from measured discharge vs ideal capacity, % |
 | `0x2C` | `0x30` | `0x32` | 2 | `u16` | `max_disch_amps` | Maximum discharge current allowed, A |
 | `0x2E` | `0x32` | `0x34` | 2 | `u16` | `max_chg_amps` | Maximum charge current allowed, A |
@@ -169,7 +169,8 @@ Only bits 0–7 are written; bytes 1–7 are always 0.
 
 ### pack_io_control_flags
 
-Select the map by `fw_part` in the [log header](index.md#log-header-0xfb).
+Select the map by `fw_part` and firmware revision in the [log header](index.md#log-header-0xfb).
+MY19 BMS rev ≤ 15: not mapped.
 
 #### BMU (`75-08274`, `75-08384`)
 

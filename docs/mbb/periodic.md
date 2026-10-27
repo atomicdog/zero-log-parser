@@ -45,7 +45,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x26` | `0x26` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
 | `0x2A` | `0x2A` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
 | `0x2C` | `0x2C` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
-| `0x30` | `0x30` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100 |
+| `0x30` | `0x30` | 4 | `s32` | `ambient_c` | Ambient temperature, °C. See [ambient_c](#ambient_c) |
 | `0x34` | `0x34` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
 | `0x38` | `0x38` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
 | `0x3C` | `0x3C` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
@@ -75,7 +75,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x2A` | `0x2A` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
 | `0x2E` | `0x2E` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
 | `0x30` | `0x30` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
-| `0x34` | `0x34` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100 |
+| `0x34` | `0x34` | 4 | `s32` | `ambient_c` | Ambient temperature, °C. See [ambient_c](#ambient_c) |
 | `0x38` | `0x38` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
 | `0x3C` | `0x3C` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
 | `0x40` | `0x40` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
@@ -105,7 +105,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x19` | `0x19` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
 | `0x1D` | `0x1D` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
 | `0x22` | `0x22` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
-| `0x26` | `0x26` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100 |
+| `0x26` | `0x26` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100; °C in rev 18–19. See [ambient_c](#ambient_c) |
 | `0x2A` | `0x2A` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
 | `0x2E` | `0x2E` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
 | `0x32` | `0x32` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
@@ -127,7 +127,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x1D` | `0x1D` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
 | `0x21` | `0x21` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
 | `0x26` | `0x26` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
-| `0x2A` | `0x2A` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100 |
+| `0x2A` | `0x2A` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100; °C in rev 18–19. See [ambient_c](#ambient_c) |
 | `0x2E` | `0x2E` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
 | `0x32` | `0x32` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
 | `0x36` | `0x36` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
@@ -156,7 +156,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x21` | `0x21` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
 | `0x25` | `0x25` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
 | `0x2A` | `0x2A` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
-| `0x2E` | `0x2E` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100 |
+| `0x2E` | `0x2E` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100; °C in rev 18–19. See [ambient_c](#ambient_c) |
 | `0x32` | `0x32` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
 | `0x36` | `0x36` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
 | `0x3A` | `0x3A` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
@@ -224,6 +224,15 @@ Logged about every 120 s while riding and every 60 min while parked.
 `0x4B`–`0x4D`: bit 8 (`0x100`) = `speed_mm_hr` invalid. Other bits are not mapped.
 
 A zero `dc_bus_current_ma` with bit 1 set means no controller data.
+
+### ambient_c
+
+| Entry | MBB firmware | Unit |
+|---|---|---|
+| `0x4C`, `0x4D` | rev 6–14 | °C |
+| `0x51`–`0x53` | rev 13–17 | °C × 100 |
+| `0x51`–`0x53` | rev 18–19 | °C |
+| `0x51`–`0x53` | rev 20+ | °C × 100 |
 
 ### temp_flags
 

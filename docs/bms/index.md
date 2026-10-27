@@ -18,7 +18,7 @@ Entry offsets (equal to file offsets once the entry is un-escaped).
 | `0x27` | 1 | `u8` | `num_parallel_cells` | Cells in parallel per series group |
 | `0x28` | 16 | `char[16]` | `board_part` | Board part number (e.g. `40-08295-01`) |
 | `0x38` | 16 | `char[16]` | `serial` | BMS serial number |
-| `0x48` | 16 | `char[16]` | `bcbm_id` | BCBM identifier (e.g. `BCBM2546`) |
+| `0x48` | 16 | `char[16]` | `bcbm_id` | BCBM identifier (e.g. `BCBM0000`) |
 | `0x58` | 16 | `char[16]` | `fw_part` | BMU firmware part number (`75-08274`, `75-08384`) |
 | `0x68` | 2 | `u16` | `fw_rev_num` | Firmware revision |
 | `0x6A` | 2 | `u16` | `fw_build_num` | Firmware package build number |

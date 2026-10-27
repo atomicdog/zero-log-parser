@@ -15,7 +15,8 @@ higher (`B2 76 FB`, `B2 7E FB`, …) and all later header bytes are shifted. Un-
 header entry before reading it.
 
 Files are always a whole number of 128-byte blocks; a size that is not a multiple of 128
-is not this format. The file content, not its name or size, identifies the ECU.
+is not this format. Partial downloads have other sizes. The file content, not its name or
+size, identifies the ECU.
 
 ## Block layout
 
