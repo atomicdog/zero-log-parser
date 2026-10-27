@@ -3,8 +3,8 @@
 | Type | Name | Payload (bytes) |
 |---|---|---|
 | `0x4B` | `periodic_small` | 40 |
-| `0x4C` | `periodic_medium` | 71 |
-| `0x4D` | `periodic_large` | 83 |
+| `0x4C` | `periodic_medium` | 71 / 74 |
+| `0x4D` | `periodic_large` | 83 / 86 |
 | `0x51` | `periodic_small2` | 58 / 62 |
 | `0x52` | `periodic_medium2` | 75 / 79 |
 | `0x53` | `periodic_large2` | 89 / 93 |
@@ -30,64 +30,66 @@ Logged about every 120 s while riding and every 60 min while parked.
 
 ## 0x4C -- periodic_medium
 
-| Offset | Size | Type | Field | Description |
-|---|---|---|---|---|
-| `0x00` | 4 | `u32` | `error_flags` | Result code. 0 = OK, 2 = no app instance (rev ≤ 11: 1 = reads failed) |
-| `0x04` | 4 | `u32` | `freeze_status` | See [freeze_status](#freeze_status) |
-| `0x08` | 4 | `u32` | `status_flags` | Validity flags. See [status_flags](#status_flags) |
-| `0x0C` | 4 | `s32` | `dc_bus_voltage_mv` | Controller DC bus voltage, mV (multiple of 100) |
-| `0x10` | 4 | `s32` | `dc_bus_current_ma` | Controller DC bus current, mA (multiple of 100). + = discharge |
-| `0x14` | 4 | `s32` | `motor_rpm` | Motor speed, rpm (×14/13 applied) |
-| `0x18` | 1 | `u8` | `soc_pct` | State of charge, % |
-| `0x19` | 4 | `u32` | `pack_voltage_mv` | Pack voltage, mV |
-| `0x1D` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
-| `0x21` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
-| `0x26` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
-| `0x2A` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
-| `0x2C` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
-| `0x30` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100 |
-| `0x34` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
-| `0x38` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
-| `0x3C` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
-| `0x40` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
-| `0x44` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
-| `0x45` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
-| `0x46` | 1 | `u8` | `odometer_low_byte` | Odometer low byte, km × 10 |
+| Offset<br>71 B | Offset<br>74 B | Size | Type | Field | Description |
+|---|---|---|---|---|---|
+| `0x00` | `0x00` | 4 | `u32` | `error_flags` | Result code. 0 = OK, 2 = no app instance (rev ≤ 11: 1 = reads failed) |
+| `0x04` | `0x04` | 4 | `u32` | `freeze_status` | See [freeze_status](#freeze_status) |
+| `0x08` | `0x08` | 4 | `u32` | `status_flags` | Validity flags. See [status_flags](#status_flags) |
+| `0x0C` | `0x0C` | 4 | `s32` | `dc_bus_voltage_mv` | Controller DC bus voltage, mV (multiple of 100) |
+| `0x10` | `0x10` | 4 | `s32` | `dc_bus_current_ma` | Controller DC bus current, mA (multiple of 100). + = discharge |
+| `0x14` | `0x14` | 4 | `s32` | `motor_rpm` | Motor speed, rpm (×14/13 applied) |
+| `0x18` | `0x18` | 1 | `u8` | `soc_pct` | State of charge, % |
+| `0x19` | `0x19` | 4 | `u32` | `pack_voltage_mv` | Pack voltage, mV |
+| `0x1D` | `0x1D` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
+| `0x21` | `0x21` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
+| `0x26` | `0x26` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
+| `0x2A` | `0x2A` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
+| `0x2C` | `0x2C` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
+| `0x30` | `0x30` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100 |
+| `0x34` | `0x34` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
+| `0x38` | `0x38` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
+| `0x3C` | `0x3C` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
+| `0x40` | `0x40` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
+| `0x44` | `0x44` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
+| `0x45` | `0x45` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
+| `0x46` | — | 1 | `u8` | `odometer_low_byte` | Odometer low byte, km × 10 |
+| — | `0x46` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10 |
 
-Firmware rev 21 and later declares this type as 74 bytes.
+71 bytes: firmware rev 6–14. 74 bytes: firmware rev 21+ (not observed in logs).
 
 ## 0x4D -- periodic_large
 
-| Offset | Size | Type | Field | Description |
-|---|---|---|---|---|
-| `0x00` | 4 | `u32` | `error_flags` | Result code. 0 = OK, 2 = no app instance (rev ≤ 11: 1 = reads failed) |
-| `0x04` | 4 | `u32` | `freeze_med2_err` | Bit 1 = medium snapshot failed. Undefined in rev 6–14 |
-| `0x08` | 4 | `u32` | `freeze_status` | See [freeze_status](#freeze_status) |
-| `0x0C` | 4 | `u32` | `status_flags` | Validity flags. See [status_flags](#status_flags) |
-| `0x10` | 4 | `s32` | `dc_bus_voltage_mv` | Controller DC bus voltage, mV (multiple of 100) |
-| `0x14` | 4 | `s32` | `dc_bus_current_ma` | Controller DC bus current, mA (multiple of 100). + = discharge |
-| `0x18` | 4 | `s32` | `motor_rpm` | Motor speed, rpm (×14/13 applied) |
-| `0x1C` | 1 | `u8` | `soc_pct` | State of charge, % |
-| `0x1D` | 4 | `u32` | `pack_voltage_mv` | Pack voltage, mV |
-| `0x21` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
-| `0x25` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
-| `0x2A` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
-| `0x2E` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
-| `0x30` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
-| `0x34` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100 |
-| `0x38` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
-| `0x3C` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
-| `0x40` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
-| `0x44` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
-| `0x48` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
-| `0x49` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
-| `0x4A` | 1 | `u8` | `odometer_low_byte` | Odometer low byte, km × 10 |
-| `0x4B` | 1 | `u8` | `controller_fault_code` | Motor controller fault code. 0 = none |
-| `0x4C` | 1 | `u8` | `pack_index` | BMS slot of the next two fields (0) |
-| `0x4D` | 4 | `u32` | `module_status_bits` | Status bits of that slot. See [module_status_bits](status.md#module_status_bits) |
-| `0x51` | 2 | `u16` | `capacity_ah` | Capacity of that slot, Ah |
+| Offset<br>83 B | Offset<br>86 B | Size | Type | Field | Description |
+|---|---|---|---|---|---|
+| `0x00` | `0x00` | 4 | `u32` | `error_flags` | Result code. 0 = OK, 2 = no app instance (rev ≤ 11: 1 = reads failed) |
+| `0x04` | `0x04` | 4 | `u32` | `freeze_med2_err` | Bit 1 = medium snapshot failed. Undefined in rev 6–14 |
+| `0x08` | `0x08` | 4 | `u32` | `freeze_status` | See [freeze_status](#freeze_status) |
+| `0x0C` | `0x0C` | 4 | `u32` | `status_flags` | Validity flags. See [status_flags](#status_flags) |
+| `0x10` | `0x10` | 4 | `s32` | `dc_bus_voltage_mv` | Controller DC bus voltage, mV (multiple of 100) |
+| `0x14` | `0x14` | 4 | `s32` | `dc_bus_current_ma` | Controller DC bus current, mA (multiple of 100). + = discharge |
+| `0x18` | `0x18` | 4 | `s32` | `motor_rpm` | Motor speed, rpm (×14/13 applied) |
+| `0x1C` | `0x1C` | 1 | `u8` | `soc_pct` | State of charge, % |
+| `0x1D` | `0x1D` | 4 | `u32` | `pack_voltage_mv` | Pack voltage, mV |
+| `0x21` | `0x21` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
+| `0x25` | `0x25` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
+| `0x2A` | `0x2A` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
+| `0x2E` | `0x2E` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
+| `0x30` | `0x30` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
+| `0x34` | `0x34` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100 |
+| `0x38` | `0x38` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
+| `0x3C` | `0x3C` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
+| `0x40` | `0x40` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
+| `0x44` | `0x44` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
+| `0x48` | `0x48` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
+| `0x49` | `0x49` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
+| `0x4A` | — | 1 | `u8` | `odometer_low_byte` | Odometer low byte, km × 10 |
+| — | `0x4A` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10 |
+| `0x4B` | `0x4E` | 1 | `u8` | `controller_fault_code` | Motor controller fault code. 0 = none |
+| `0x4C` | `0x4F` | 1 | `u8` | `pack_index` | BMS slot of the next two fields (0) |
+| `0x4D` | `0x50` | 4 | `u32` | `module_status_bits` | Status bits of that slot. See [module_status_bits](status.md#module_status_bits) |
+| `0x51` | `0x54` | 2 | `u16` | `capacity_ah` | Capacity of that slot, Ah |
 
-Firmware rev 21 and later declares this type as 86 bytes.
+83 bytes: firmware rev 6–14. 86 bytes: firmware rev 21+ (not observed in logs).
 
 ## 0x51 -- periodic_small2
 
@@ -142,8 +144,8 @@ Firmware rev 21 and later declares this type as 86 bytes.
 
 | Offset<br>89 B | Offset<br>93 B | Size | Type | Field | Description |
 |---|---|---|---|---|---|
-| `0x00` | `0x00` | 4 | `u32` | `error_flags` | Result flags |
-| `0x04` | `0x04` | 4 | `u32` | `freeze_med2_err` | Medium-snapshot error flags |
+| `0x00` | `0x00` | 4 | `u32` | `error_flags` | Result code. 0 = OK, 2 = no app instance (rev ≤ 11: 1 = reads failed) |
+| `0x04` | `0x04` | 4 | `u32` | `freeze_med2_err` | Read failures. See [freeze_med2_err](#freeze_med2_err) |
 | `0x08` | `0x08` | 4 | `u32` | `freeze_med2_flags` | Validity flags. See [freeze_med2_flags](#freeze_med2_flags) |
 | `0x0C` | `0x0C` | 4 | `u32` | `status_flags` | Validity flags. See [status_flags](#status_flags) |
 | `0x10` | `0x10` | 4 | `s32` | `dc_bus_voltage_mv` | Controller DC bus voltage, mV (multiple of 100) |
@@ -240,6 +242,16 @@ A zero `dc_bus_current_ma` with bit 1 set means no controller data.
 | 1 | `0x02` | Small snapshot failed |
 | 5 | `0x20` | `speed_mm_hr` invalid |
 | 7 | `0x80` | `bms_lowest_dis_allow` invalid |
+
+### freeze_med2_err
+
+`0x53`. A set bit means the read failed.
+
+| Bit | Mask | Meaning |
+|---|---|---|
+| 1 | `0x02` | Medium snapshot failed |
+| 6 | `0x40` | `bms_avg_dis_allow` unavailable |
+| 7 | `0x80` | `bms_avg_chg_allow` unavailable |
 
 ### freeze_status
 

@@ -121,10 +121,14 @@ Fault code `0x29`.
 
 ## 0x8A / 0x8B -- fan
 
-| Type | Name | Payload |
-|---|---|---|
-| `0x8A` | `fan_on` | 0 |
-| `0x8B` | `fan_off` | 0 |
+| Type | Name |
+|---|---|
+| `0x8A` | `fan_on` |
+| `0x8B` | `fan_off` |
+
+| Offset | Size | Type | Field | Description |
+|---|---|---|---|---|
+| `0x00` | 1 | `s8` | `max_cell_temp_c` | Maximum cell temperature when the fan switched, °C |
 
 ## Damaged entries
 

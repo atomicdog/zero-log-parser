@@ -103,8 +103,8 @@ Both produce identical entry layouts.
 | `0x87` | `cell_temp_too_high_for_chg` | 1 | Cell too hot to charge | [Cell data](cell-data.md#0x86-0x89-cell-temperature-limits) |
 | `0x88` | `cell_temp_too_low_for_dischg` | 1 | Cell too cold to discharge | [Cell data](cell-data.md#0x86-0x89-cell-temperature-limits) |
 | `0x89` | `cell_temp_too_high_for_dischg` | 1 | Cell too hot to discharge | [Cell data](cell-data.md#0x86-0x89-cell-temperature-limits) |
-| `0x8A` | `fan_on` | 0 | Fan turned on | — |
-| `0x8B` | `fan_off` | 0 | Fan turned off | — |
+| `0x8A` | `fan_on` | 1 | Fan turned on | [Diagnostics](diagnostics.md#0x8a-0x8b-fan) |
+| `0x8B` | `fan_off` | 1 | Fan turned off | [Diagnostics](diagnostics.md#0x8a-0x8b-fan) |
 | `0x8C` | `isolation_severe` | 4 | Severe isolation fault, set (rev 17+) | [Faults](faults.md#isolation-and-voltage-sensor) |
 | `0x8D` | `isolation_severe_clr` | 4 | Severe isolation fault, clear (rev 17+) | [Faults](faults.md#isolation-and-voltage-sensor) |
 | `0xFB` | `log_header` | 112 | Log header (first entry of the file) | [Log header](#log-header-0xfb) |

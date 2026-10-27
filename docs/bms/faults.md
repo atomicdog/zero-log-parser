@@ -27,8 +27,8 @@ Set and clear entries of a fault share one layout.
 | `0x0E` | 2 | `u16` | `oc_limit_2_a` | Overcurrent limit, tier 2, A |
 | `0x10` | 2 | `u16` | `oc_limit_3_a` | Overcurrent limit, tier 3, A |
 | `0x12` | 2 | `s16` | `trigger_cell_mv` | Discharge: lowest cell; charge: highest cell, mV |
-| `0x14` | 1 | `s8` | `max_cell_temp_c` | Maximum cell temperature, °C |
-| `0x15` | 1 | `u8` | `min_cell_temp_c` | Minimum cell temperature, °C |
+| `0x14` | 1 | `s8` | `min_cell_temp_c` | Minimum cell temperature, °C |
+| `0x15` | 1 | `s8` | `max_cell_temp_c` | Maximum cell temperature, °C |
 
 ## 0x55 -- cont_fault
 

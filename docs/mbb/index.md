@@ -39,8 +39,8 @@ Entry offsets (equal to file offsets once the entry is un-escaped).
 | `0x49` | `charging_state` | 25 | Charging state | [Charging](charging.md#0x49-charging_state) |
 | `0x4A` | `elock_status` | 13 | Electronic lock status | [Status](status.md#0x4a-elock_status) |
 | `0x4B` | `periodic_small` | 40 | Periodic snapshot, small, first generation | [Periodic](periodic.md#0x4b-periodic_small) |
-| `0x4C` | `periodic_medium` | 71 | Periodic snapshot, medium, first generation | [Periodic](periodic.md#0x4c-periodic_medium) |
-| `0x4D` | `periodic_large` | 83 | Periodic snapshot, large, first generation | [Periodic](periodic.md#0x4d-periodic_large) |
+| `0x4C` | `periodic_medium` | 71 / 74 | Periodic snapshot, medium, first generation | [Periodic](periodic.md#0x4c-periodic_medium) |
+| `0x4D` | `periodic_large` | 83 / 86 | Periodic snapshot, large, first generation | [Periodic](periodic.md#0x4d-periodic_large) |
 | `0x4E` | `firmware_updated` | 54 / 52 | Firmware updated | [Events](events.md#0x4e-firmware_updated) |
 | `0x4F` | `queue_send_fail` | 18 | RTOS queue send failure | [Faults](faults.md#0x4f-queue_send_fail) |
 | `0x50` | `mcu_fault` | 25 | MCU fault registers | [Faults](faults.md#0x50-mcu_fault) |
