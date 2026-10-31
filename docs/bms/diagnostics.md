@@ -21,7 +21,7 @@ Fault code `0x06`.
 
 | Offset | Size | Type | Field | Description |
 |---|---|---|---|---|
-| `0x00` | 9 | `u8[9]` | `temp_sensors_c` | Temperature sensors 0–8, °C |
+| `0x00` | 9 | `s8[9]` | `temp_sensors_c` | Index 0–7: pack thermistors. Index 8: fuse thermistor. Whole °C, truncated toward zero |
 | `0x09` | 2 | `s16` | `supply_5v_mv` | 5 V supply, filtered, mV |
 | `0x0B` | 2 | `s16` | `vref_mv` | ADC reference, mV |
 | `0x0D` | 4 | `u32` | `time_since_valid_ms` | Time since last valid pack temperature reading, ms |

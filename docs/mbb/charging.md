@@ -74,20 +74,30 @@ Low bits give the power class: 1 = 3 kW, 2 = 6 kW.
 | `0x09` | 4 | `s32` | `charge_current_a` | Total charge current, A. mA in rev ≤ 15 |
 | `0x0D` | 1 | `u8` | `evse_disconnect_flags` | 0 = EVSE connected |
 | `0x0E` | 1 | `u8` | `schedule_charge_enabled` | 1 = scheduled charging enabled |
-| `0x0F` | 4 | `u32` | `active_sched_window_val` | Today's charge window. See [active_sched_window_val](#active_sched_window_val) |
+| `0x0F` | 4 | `u32` | `active_sched_window_val` | Today's charge windows. See [active_sched_window_val](#active_sched_window_val) |
 | `0x13` | 1 | `u8` | `charging_enabled` | 1 = charging enabled |
 | `0x14` | 1 | `u8` | `evse_allowed_current_a` | EVSE allowed current, A |
 | `0x15` | 4 | `u32` | `hard_charge_target_mv` | Hard charge target, mV. 0 = disabled |
 
 ### active_sched_window_val
 
-| Bits | Field | Scale |
+Four bytes, in 30-minute slots. Times are after the bike's time-offset setting.
+
+| Byte | Field | Range |
 |---|---|---|
-| 25:21 | Start hour | × 8 |
-| 17:13 | Start minute | × 8 |
-| 9:5 | End hour | × 8 |
-| 4:0 | End minute | × 8 |
+| 0 | Window A duration | 0–48 |
+| 1 | Window A start | 0–47 |
+| 2 | Window B duration | 0–48 |
+| 3 | Window B start | 0–47 |
 
-0 = no schedule.
+| Window | Role |
+|---|---|
+| A | Puts the charger into `WAIT` |
+| B | Starts charging |
 
-Bit layout and scale are unconfirmed.
+Window roles are from one firmware build.
+
+The value is logged whether or not `schedule_charge_enabled` is set. A day setting of 0
+leaves the previous value in place.
+
+This layout applies from rev 13 onward. In rev 6–11, many non-zero values are not schedules.

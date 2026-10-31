@@ -49,6 +49,7 @@ both with unrelated layouts; select the table by the file's ECU.
 | Byte order | Little-endian |
 | Offsets | Hexadecimal, relative to the start of the payload (after the 13-byte entry header) unless stated otherwise. All offsets apply after un-escaping. |
 | Sizes | Decimal bytes |
+| zero-log-parser | Its Gen3 code starts the payload at `usec`: its offset = this offset + 6, and its payload sizes are these plus 6 (`0x51` 58 / 62 here is 64 / 68 there). Tag-relative offsets are the same. |
 | `u8` `u16` `u32` `u64` | Unsigned integers |
 | `s8` `s16` `s32` | Signed (two's complement) integers |
 | `u24` | 3-byte unsigned integer |
@@ -273,7 +274,7 @@ def core(state_desc='Bike state. See [State](#state)'):
 
 
 ERR = F('error_flags', 'u32', 'Result code. 0 = OK, 2 = no app instance (rev ≤ 11: 1 = reads failed)')
-SPEED = F('speed_mm_hr', 's32', 'Vehicle speed, mm/h (÷ 10⁶ = km/h)')
+SPEED = F('speed_mm_hr', 's32', 'Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr)')
 RANGE = F('range_km_x100', 'u16', 'Estimated range, km × 100')
 
 
@@ -302,7 +303,7 @@ SLOT = [
 FLAGS2 = F('status_flags', 'u32', 'Validity flags. See [status_flags](#status_flags)')
 MED2 = F('freeze_med2_flags', 'u32', 'Validity flags. See [freeze_med2_flags](#freeze_med2_flags)')
 TAIL2 = [
-    F('odometer_km_x10', 'u32', 'Odometer, km × 10'),
+    F('odometer_km_x10', 'u32', 'Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10)'),
     SPEED,
     RANGE,
     F('bms_lowest_dis_allow', 'u8', 'Lowest BMS discharge allowance'),
@@ -311,7 +312,7 @@ TAIL2 = [
 P4B = [ERR, F('status_flags', 'u32', 'Validity flags. See [status_flags](#status_flags)')] + core() + [SPEED, RANGE]
 def odometer(short, long):
     return [F('odometer_low_byte', 'u8', 'Odometer low byte, km × 10', only={short}),
-            F('odometer_km_x10', 'u32', 'Odometer, km × 10', only={long})]
+            F('odometer_km_x10', 'u32', 'Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10)', only={long})]
 
 
 P4C = [ERR, F('freeze_status', 'u32', 'See [freeze_status](#freeze_status)'),
@@ -407,6 +408,22 @@ Logged about every 120 s while riding and every 60 min while parked.
 `0x4B`–`0x4D`: bit 8 (`0x100`) = `speed_mm_hr` invalid. Other bits are not mapped.
 
 A zero `dc_bus_current_ma` with bit 1 set means no controller data.
+
+### speed_mm_hr
+
+Rear wheel speed from the ABS module: CAN `0x12B` bytes 2–3, `u16` × 56,250 mm/h. Values are
+multiples of 56,250.
+
+### odometer_km_x10
+
+Exactly 100 m per count. Derived from motor revolutions and a gearing setting, not from wheel
+speed, so it does not match `speed_mm_hr` integrated over time.
+
+| Platform | Odometer distance / rear wheel distance |
+|---|---|
+| SR/F, SR/S, SR, S | 1.006 |
+| DSR/X, DSR | 1.052 |
+| DS | 1.051 |
 
 ### ambient_c
 
@@ -549,7 +566,7 @@ P49 = [
     F('charge_current_a', 's32', 'Total charge current, A. mA in rev ≤ 15'),
     F('evse_disconnect_flags', 'u8', '0 = EVSE connected'),
     F('schedule_charge_enabled', 'u8', '1 = scheduled charging enabled'),
-    F('active_sched_window_val', 'u32', "Today's charge window. See [active_sched_window_val](#active_sched_window_val)"),
+    F('active_sched_window_val', 'u32', "Today's charge windows. See [active_sched_window_val](#active_sched_window_val)"),
     F('charging_enabled', 'u8', '1 = charging enabled'),
     F('evse_allowed_current_a', 'u8', 'EVSE allowed current, A'),
     F('hard_charge_target_mv', 'u32', 'Hard charge target, mV. 0 = disabled'),
@@ -591,16 +608,26 @@ Low bits give the power class: 1 = 3 kW, 2 = 6 kW.
 
 ### active_sched_window_val
 
-| Bits | Field | Scale |
+Four bytes, in 30-minute slots. Times are after the bike's time-offset setting.
+
+| Byte | Field | Range |
 |---|---|---|
-| 25:21 | Start hour | × 8 |
-| 17:13 | Start minute | × 8 |
-| 9:5 | End hour | × 8 |
-| 4:0 | End minute | × 8 |
+| 0 | Window A duration | 0–48 |
+| 1 | Window A start | 0–47 |
+| 2 | Window B duration | 0–48 |
+| 3 | Window B start | 0–47 |
 
-0 = no schedule.
+| Window | Role |
+|---|---|
+| A | Puts the charger into `WAIT` |
+| B | Starts charging |
 
-Bit layout and scale are unconfirmed.
+Window roles are from one firmware build.
+
+The value is logged whether or not `schedule_charge_enabled` is set. A day setting of 0
+leaves the previous value in place.
+
+This layout applies from rev 13 onward. In rev 6–11, many non-zero values are not schedules.
 """)
 
 # faults ------------------------------------------------------------------
@@ -611,7 +638,7 @@ P4F = [
     F('send_fail_count', 'u32', 'Failed sends, all queues, since power-on'),
 ]
 P50 = [
-    F('fault_type', 'u8', 'Fault type. 1 = hard fault'),
+    F('fault_type', 'u8', 'Fault type. 1 = hard, 2 = bus, 4 = usage'),
     F('fault_data_0', 'u32', 'HFSR'),
     F('fault_data_1', 'u32', 'CFSR'),
     F('fault_data_2', 'u32', 'BFAR'),
@@ -636,10 +663,6 @@ page('mbb/faults.md', f"""
 ## 0x50 -- mcu_fault
 
 {table(P50, [(None, 25)])}
-
-!!! note
-    Register assignment of `fault_data_0`–`fault_data_5` follows the BMS
-    [`0x7E` mcu_fault](../bms/diagnostics.md#0x7e-mcu_fault) layout and is unconfirmed for the MBB.
 
 See [CFSR bits](../bms/diagnostics.md#cfsr-bits).
 """)
@@ -789,7 +812,10 @@ Entry offsets (equal to file offsets once the entry is un-escaped).
 
 {table(BMS_HEADER, [(None, 125)])}
 
-A 126-byte variant carries one trailing `0x00`.
+125 is the only real length. A 124-byte header, or a 126-byte header with no escape, is
+download damage: the header is rebuilt for each 7-byte CAN segment, so an escape present in
+only some segments loses or shifts bytes. Fields otherwise keep this layout. The missing
+byte is usually raw offset 14.
 
 ### Board variants
 
@@ -1268,7 +1294,7 @@ B6B = [
     F('supply_9v5v_on', 'u8', '1 = 9 V / 5 V supply on'),
 ]
 B6E = [
-    F('temp_sensors_c', 'u8[9]', 'Temperature sensors 0–8, °C'),
+    F('temp_sensors_c', 's8[9]', 'Index 0–7: pack thermistors. Index 8: fuse thermistor. Whole °C, truncated toward zero'),
     F('supply_5v_mv', 's16', '5 V supply, filtered, mV'),
     F('vref_mv', 's16', 'ADC reference, mV'),
     F('time_since_valid_ms', 'u32', 'Time since last valid pack temperature reading, ms'),

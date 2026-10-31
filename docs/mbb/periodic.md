@@ -25,7 +25,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x15` | 4 | `u32` | `pack_voltage_mv` | Pack voltage, mV |
 | `0x19` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
 | `0x1D` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
-| `0x22` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
+| `0x22` | 4 | `s32` | `speed_mm_hr` | Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr) |
 | `0x26` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
 
 ## 0x4C -- periodic_medium
@@ -42,7 +42,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x19` | `0x19` | 4 | `u32` | `pack_voltage_mv` | Pack voltage, mV |
 | `0x1D` | `0x1D` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
 | `0x21` | `0x21` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
-| `0x26` | `0x26` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
+| `0x26` | `0x26` | 4 | `s32` | `speed_mm_hr` | Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr) |
 | `0x2A` | `0x2A` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
 | `0x2C` | `0x2C` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
 | `0x30` | `0x30` | 4 | `s32` | `ambient_c` | Ambient temperature, °C. See [ambient_c](#ambient_c) |
@@ -53,7 +53,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x44` | `0x44` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
 | `0x45` | `0x45` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
 | `0x46` | — | 1 | `u8` | `odometer_low_byte` | Odometer low byte, km × 10 |
-| — | `0x46` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10 |
+| — | `0x46` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
 
 71 bytes: firmware rev 6–14. 74 bytes: firmware rev 21+ (not observed in logs).
 
@@ -72,7 +72,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x1D` | `0x1D` | 4 | `u32` | `pack_voltage_mv` | Pack voltage, mV |
 | `0x21` | `0x21` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
 | `0x25` | `0x25` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
-| `0x2A` | `0x2A` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
+| `0x2A` | `0x2A` | 4 | `s32` | `speed_mm_hr` | Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr) |
 | `0x2E` | `0x2E` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
 | `0x30` | `0x30` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
 | `0x34` | `0x34` | 4 | `s32` | `ambient_c` | Ambient temperature, °C. See [ambient_c](#ambient_c) |
@@ -83,7 +83,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x48` | `0x48` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
 | `0x49` | `0x49` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
 | `0x4A` | — | 1 | `u8` | `odometer_low_byte` | Odometer low byte, km × 10 |
-| — | `0x4A` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10 |
+| — | `0x4A` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
 | `0x4B` | `0x4E` | 1 | `u8` | `controller_fault_code` | Motor controller fault code. 0 = none |
 | `0x4C` | `0x4F` | 1 | `u8` | `pack_index` | BMS slot of the next two fields (0) |
 | `0x4D` | `0x50` | 4 | `u32` | `module_status_bits` | Status bits of that slot. See [module_status_bits](status.md#module_status_bits) |
@@ -135,8 +135,8 @@ Logged about every 120 s while riding and every 60 min while parked.
 | — | `0x3E` | 4 | `u32` | `battery_12v` | 12 V battery voltage, µV |
 | `0x3E` | `0x42` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
 | `0x3F` | `0x43` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
-| `0x40` | `0x44` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10 |
-| `0x44` | `0x48` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
+| `0x40` | `0x44` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
+| `0x44` | `0x48` | 4 | `s32` | `speed_mm_hr` | Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr) |
 | `0x48` | `0x4C` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
 | `0x4A` | `0x4E` | 1 | `u8` | `bms_lowest_dis_allow` | Lowest BMS discharge allowance |
 
@@ -164,8 +164,8 @@ Logged about every 120 s while riding and every 60 min while parked.
 | — | `0x42` | 4 | `u32` | `battery_12v` | 12 V battery voltage, µV |
 | `0x42` | `0x46` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
 | `0x43` | `0x47` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
-| `0x44` | `0x48` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10 |
-| `0x48` | `0x4C` | 4 | `s32` | `speed_mm_hr` | Vehicle speed, mm/h (÷ 10⁶ = km/h) |
+| `0x44` | `0x48` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
+| `0x48` | `0x4C` | 4 | `s32` | `speed_mm_hr` | Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr) |
 | `0x4C` | `0x50` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
 | `0x4E` | `0x52` | 1 | `u8` | `bms_lowest_dis_allow` | Lowest BMS discharge allowance |
 | `0x4F` | `0x53` | 1 | `u8` | `controller_fault_code` | Motor controller fault code. 0 = none |
@@ -224,6 +224,22 @@ Logged about every 120 s while riding and every 60 min while parked.
 `0x4B`–`0x4D`: bit 8 (`0x100`) = `speed_mm_hr` invalid. Other bits are not mapped.
 
 A zero `dc_bus_current_ma` with bit 1 set means no controller data.
+
+### speed_mm_hr
+
+Rear wheel speed from the ABS module: CAN `0x12B` bytes 2–3, `u16` × 56,250 mm/h. Values are
+multiples of 56,250.
+
+### odometer_km_x10
+
+Exactly 100 m per count. Derived from motor revolutions and a gearing setting, not from wheel
+speed, so it does not match `speed_mm_hr` integrated over time.
+
+| Platform | Odometer distance / rear wheel distance |
+|---|---|
+| SR/F, SR/S, SR, S | 1.006 |
+| DSR/X, DSR | 1.052 |
+| DS | 1.051 |
 
 ### ambient_c
 

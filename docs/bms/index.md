@@ -25,7 +25,10 @@ Entry offsets (equal to file offsets once the entry is un-escaped).
 | `0x6C` | 16 | `char[16]` | `commit_hash` | Firmware package git commit hash |
 | `0x7C` | 1 | `u8` | `firmware_bank` | Running flash bank. 1 = A, 2 = B |
 
-A 126-byte variant carries one trailing `0x00`.
+125 is the only real length. A 124-byte header, or a 126-byte header with no escape, is
+download damage: the header is rebuilt for each 7-byte CAN segment, so an escape present in
+only some segments loses or shifts bytes. Fields otherwise keep this layout. The missing
+byte is usually raw offset 14.
 
 ### Board variants
 

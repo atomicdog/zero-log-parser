@@ -27,16 +27,12 @@
 
 | Offset | Size | Type | Field | Description |
 |---|---|---|---|---|
-| `0x00` | 1 | `u8` | `fault_type` | Fault type. 1 = hard fault |
+| `0x00` | 1 | `u8` | `fault_type` | Fault type. 1 = hard, 2 = bus, 4 = usage |
 | `0x01` | 4 | `u32` | `fault_data_0` | HFSR |
 | `0x05` | 4 | `u32` | `fault_data_1` | CFSR |
 | `0x09` | 4 | `u32` | `fault_data_2` | BFAR |
 | `0x0D` | 4 | `u32` | `fault_data_3` | Exception stack pointer |
 | `0x11` | 4 | `u32` | `fault_data_4` | LR |
 | `0x15` | 4 | `u32` | `fault_data_5` | PC |
-
-!!! note
-    Register assignment of `fault_data_0`–`fault_data_5` follows the BMS
-    [`0x7E` mcu_fault](../bms/diagnostics.md#0x7e-mcu_fault) layout and is unconfirmed for the MBB.
 
 See [CFSR bits](../bms/diagnostics.md#cfsr-bits).

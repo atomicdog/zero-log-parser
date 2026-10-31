@@ -11,7 +11,7 @@ SIZES = {'u8': 1, 's8': 1, 'u16': 2, 's16': 2, 'u24': 3, 'u32': 4, 's32': 4, 'u6
 def size_of(t):
     if t in SIZES:
         return SIZES[t]
-    m = re.fullmatch(r'(?:char|u8|u16|bytes)\[(\d+)\]', t)
+    m = re.fullmatch(r'(?:char|u8|s8|u16|bytes)\[(\d+)\]', t)
     if not m:
         raise ValueError(t)
     n = int(m.group(1))
