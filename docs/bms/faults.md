@@ -55,7 +55,7 @@ Clear entries are 7 bytes. Set entries:
 | Set entry | Firmware |
 |---|---|
 | 63 B | BMU |
-| 7 B | 2019–20 MY19 BMS (rev 11). Same layout as the clear entry |
+| 7 B | 2019–20 MY19 BMS. Same layout as the clear entry. Seen for `0x57` at rev 11; `0x59`, `0x5B` assumed from the shared layout |
 
 | Offset<br>7 B | Offset<br>63 B | Size | Type | Field | Description |
 |---|---|---|---|---|---|
