@@ -27,7 +27,7 @@ One entry per charger.
 | `0x2E` | 2 | `u16` | `setpt_ac_input_a` | Commanded AC input current limit, A |
 | `0x30` | 1 | `u8` | `en_flag` | Charger enabled |
 
-Firmware rev 7–11: two chargers are logged as one 98-byte entry (two consecutive records).
+Firmware rev 6–11: two chargers are logged as one 98-byte entry (two consecutive records).
 
 | MBB firmware | Current fields |
 |---|---|

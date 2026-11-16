@@ -594,7 +594,7 @@ One entry per charger.
 
 {table(P48, [(None, 49)])}
 
-Firmware rev 7–11: two chargers are logged as one 98-byte entry (two consecutive records).
+Firmware rev 6–11: two chargers are logged as one 98-byte entry (two consecutive records).
 
 | MBB firmware | Current fields |
 |---|---|
