@@ -53,7 +53,7 @@
 | — | — | `0x2A` | 1 | `u8` | `highest_cell_index` | Highest cell, 0–27. `0xFF` = unavailable |
 | `0x25` | `0x29` | `0x2B` | 1 | `s8` | `min_cell_temp_c` | Minimum cell temperature, °C |
 | `0x26` | `0x2A` | `0x2C` | 1 | `s8` | `max_cell_temp_c` | Maximum cell temperature, °C |
-| `0x27` | `0x2B` | `0x2D` | 1 | `u8` | `soc_meas_disch_pct` | SOC from measured discharge vs ideal capacity, % |
+| `0x27` | `0x2B` | `0x2D` | 1 | `u8` | `soc_meas_disch_pct` | SOC from measured discharge vs ideal capacity, %. See [soc_meas_disch_pct](#soc_meas_disch_pct) |
 | `0x28` | `0x2C` | `0x2E` | 2 | `u16` | `max_disch_amps` | Maximum discharge current allowed, A |
 | `0x2A` | `0x2E` | `0x30` | 2 | `u16` | `max_chg_amps` | Maximum charge current allowed, A |
 | `0x2C` | `0x30` | `0x32` | 4 | `u32` | `adj_pack_cap_mah` | Adjusted pack capacity, mAh |
@@ -82,7 +82,7 @@
 | — | — | `0x2E` | 1 | `u8` | `highest_cell_index` | Highest cell, 0–27. `0xFF` = unavailable |
 | `0x29` | `0x2D` | `0x2F` | 1 | `s8` | `min_cell_temp_c` | Minimum cell temperature, °C |
 | `0x2A` | `0x2E` | `0x30` | 1 | `s8` | `max_cell_temp_c` | Maximum cell temperature, °C |
-| `0x2B` | `0x2F` | `0x31` | 1 | `u8` | `soc_meas_disch_pct` | SOC from measured discharge vs ideal capacity, % |
+| `0x2B` | `0x2F` | `0x31` | 1 | `u8` | `soc_meas_disch_pct` | SOC from measured discharge vs ideal capacity, %. See [soc_meas_disch_pct](#soc_meas_disch_pct) |
 | `0x2C` | `0x30` | `0x32` | 2 | `u16` | `max_disch_amps` | Maximum discharge current allowed, A |
 | `0x2E` | `0x32` | `0x34` | 2 | `u16` | `max_chg_amps` | Maximum charge current allowed, A |
 | `0x30` | `0x34` | `0x36` | 4 | `u32` | `adj_pack_cap_mah` | Adjusted pack capacity, mAh |
@@ -151,6 +151,18 @@ A set bit means the matching field is not a reading. `soc_pct` = 0 with
 
 2019–20 SR/F firmware writes `entry_error_flags` = 1, `sensor_read_failures` = `0x10` in a
 reduced-reporting state; `soc_pct` and `pack_current_ma` then read 0.
+
+### soc_meas_disch_pct
+
+100 − counted discharge / ideal capacity, %.
+
+- The counter is a net coulomb count: discharge adds, charge subtracts. It never goes below 0,
+  counts only at |current| ≥ 5 A, and resets at a full charge (field reads 100).
+- Unlike `soc_pct`, it is never corrected toward the voltage-based SOC.
+- Ideal capacity = 72 Ah per cell × parallel cells (MY22 BMU).
+- During a ride it falls at the same rate as `soc_pct` on MY22 packs but usually starts several
+  points higher. Compare drops, not levels: the ratio of the two levels overstates pack capacity.
+- MY19 BMS: drops run about 0.75–0.85 of `soc_pct`'s.
 
 ### bms_faults
 

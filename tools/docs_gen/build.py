@@ -899,7 +899,7 @@ def bms_medium_tail(sizes):
     return [
         F('min_cell_temp_c', 's8', 'Minimum cell temperature, °C'),
         F('max_cell_temp_c', 's8', 'Maximum cell temperature, °C'),
-        F('soc_meas_disch_pct', 'u8', 'SOC from measured discharge vs ideal capacity, %'),
+        F('soc_meas_disch_pct', 'u8', 'SOC from measured discharge vs ideal capacity, %. See [soc_meas_disch_pct](#soc_meas_disch_pct)'),
         F('max_disch_amps', 'u16', 'Maximum discharge current allowed, A'),
         F('max_chg_amps', 'u16', 'Maximum charge current allowed, A'),
         F('adj_pack_cap_mah', 'u32', 'Adjusted pack capacity, mAh'),
@@ -1038,6 +1038,18 @@ A set bit means the matching field is not a reading. `soc_pct` = 0 with
 
 2019–20 SR/F firmware writes `entry_error_flags` = 1, `sensor_read_failures` = `0x10` in a
 reduced-reporting state; `soc_pct` and `pack_current_ma` then read 0.
+
+### soc_meas_disch_pct
+
+100 − counted discharge / ideal capacity, %.
+
+- The counter is a net coulomb count: discharge adds, charge subtracts. It never goes below 0,
+  counts only at |current| ≥ 5 A, and resets at a full charge (field reads 100).
+- Unlike `soc_pct`, it is never corrected toward the voltage-based SOC.
+- Ideal capacity = 72 Ah per cell × parallel cells (MY22 BMU).
+- During a ride it falls at the same rate as `soc_pct` on MY22 packs but usually starts several
+  points higher. Compare drops, not levels: the ratio of the two levels overstates pack capacity.
+- MY19 BMS: drops run about 0.75–0.85 of `soc_pct`'s.
 
 ### bms_faults
 
