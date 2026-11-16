@@ -55,11 +55,11 @@ Both produce identical entry layouts.
 | `0x54` | `chg_overcur_clr` | 22 | Charge overcurrent, clear | [Faults](faults.md#overcurrent) |
 | `0x55` | `cont_fault` | 14 | Contactor fault, set | [Faults](faults.md#0x55-cont_fault) |
 | `0x56` | `cont_fault_clr` | 0 | Contactor fault, clear | — |
-| `0x57` | `ov_fault` | 63 | Cell overvoltage, set | [Faults](faults.md#voltage) |
+| `0x57` | `ov_fault` | 63 / 7 | Cell overvoltage, set | [Faults](faults.md#voltage) |
 | `0x58` | `ov_fault_clr` | 7 | Cell overvoltage, clear | [Faults](faults.md#voltage) |
-| `0x59` | `uv_chg_fault` | 63 | Cell undervoltage (charge), set | [Faults](faults.md#voltage) |
+| `0x59` | `uv_chg_fault` | 63 / 7 | Cell undervoltage (charge), set | [Faults](faults.md#voltage) |
 | `0x5A` | `uv_chg_fault_clr` | 7 | Cell undervoltage (charge), clear | [Faults](faults.md#voltage) |
-| `0x5B` | `uv_dischg_fault` | 63 | Cell undervoltage (discharge), set | [Faults](faults.md#voltage) |
+| `0x5B` | `uv_dischg_fault` | 63 / 7 | Cell undervoltage (discharge), set | [Faults](faults.md#voltage) |
 | `0x5C` | `uv_dischg_fault_clr` | 7 | Cell undervoltage (discharge), clear | [Faults](faults.md#voltage) |
 | `0x5D` | `ot_chg` | 13 | Overtemperature (charge), set | [Faults](faults.md#temperature) |
 | `0x5E` | `ot_chg_clr` | 13 | Overtemperature (charge), clear | [Faults](faults.md#temperature) |

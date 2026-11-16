@@ -50,7 +50,12 @@ Fault code `0x02`. Clear entry `0x56` has no payload.
 | `0x59` / `0x5A` | `uv_chg_fault` / `_clr` | `0x11` | Lowest |
 | `0x5B` / `0x5C` | `uv_dischg_fault` / `_clr` | `0x12` | Lowest |
 
-Set entries are 63 bytes; clear entries are 7 bytes.
+Clear entries are 7 bytes. Set entries:
+
+| Set entry | Firmware |
+|---|---|
+| 63 B | BMU |
+| 7 B | 2019–20 MY19 BMS (rev 11). Same layout as the clear entry |
 
 | Offset<br>7 B | Offset<br>63 B | Size | Type | Field | Description |
 |---|---|---|---|---|---|

@@ -773,11 +773,11 @@ BMS_TYPES = values([
     ('`0x54`', '`chg_overcur_clr`', '22', 'Charge overcurrent, clear', '[Faults](faults.md#overcurrent)'),
     ('`0x55`', '`cont_fault`', '14', 'Contactor fault, set', '[Faults](faults.md#0x55-cont_fault)'),
     ('`0x56`', '`cont_fault_clr`', '0', 'Contactor fault, clear', '—'),
-    ('`0x57`', '`ov_fault`', '63', 'Cell overvoltage, set', '[Faults](faults.md#voltage)'),
+    ('`0x57`', '`ov_fault`', '63 / 7', 'Cell overvoltage, set', '[Faults](faults.md#voltage)'),
     ('`0x58`', '`ov_fault_clr`', '7', 'Cell overvoltage, clear', '[Faults](faults.md#voltage)'),
-    ('`0x59`', '`uv_chg_fault`', '63', 'Cell undervoltage (charge), set', '[Faults](faults.md#voltage)'),
+    ('`0x59`', '`uv_chg_fault`', '63 / 7', 'Cell undervoltage (charge), set', '[Faults](faults.md#voltage)'),
     ('`0x5A`', '`uv_chg_fault_clr`', '7', 'Cell undervoltage (charge), clear', '[Faults](faults.md#voltage)'),
-    ('`0x5B`', '`uv_dischg_fault`', '63', 'Cell undervoltage (discharge), set', '[Faults](faults.md#voltage)'),
+    ('`0x5B`', '`uv_dischg_fault`', '63 / 7', 'Cell undervoltage (discharge), set', '[Faults](faults.md#voltage)'),
     ('`0x5C`', '`uv_dischg_fault_clr`', '7', 'Cell undervoltage (discharge), clear', '[Faults](faults.md#voltage)'),
     ('`0x5D`', '`ot_chg`', '13', 'Overtemperature (charge), set', '[Faults](faults.md#temperature)'),
     ('`0x5E`', '`ot_chg_clr`', '13', 'Overtemperature (charge), clear', '[Faults](faults.md#temperature)'),
@@ -1171,7 +1171,12 @@ Fault code `0x02`. Clear entry `0x56` has no payload.
 | `0x59` / `0x5A` | `uv_chg_fault` / `_clr` | `0x11` | Lowest |
 | `0x5B` / `0x5C` | `uv_dischg_fault` / `_clr` | `0x12` | Lowest |
 
-Set entries are 63 bytes; clear entries are 7 bytes.
+Clear entries are 7 bytes. Set entries:
+
+| Set entry | Firmware |
+|---|---|
+| 63 B | BMU |
+| 7 B | 2019–20 MY19 BMS (rev 11). Same layout as the clear entry |
 
 {table(BVS, [('7 B', 7), ('63 B', 63)])}
 
@@ -1451,6 +1456,7 @@ Fault code `0x29`.
 |---|---|
 | `B2 00 F0 …` | Entry overwritten by the download stamp. See [File format](../file-format.md#bms-download-stamp) |
 | Type `0x00` | Entry whose type byte was overwritten by the download stamp |
+| Unexpected type or size | Entry header in the last two bytes of a block, followed by a [repeated block](../file-format.md#repeated-blocks); the copy's first byte reads as the type. Gone once repeated blocks are dropped |
 """)
 
 # --------------------------------------------------------------------------

@@ -136,3 +136,4 @@ Fault code `0x29`.
 |---|---|
 | `B2 00 F0 …` | Entry overwritten by the download stamp. See [File format](../file-format.md#bms-download-stamp) |
 | Type `0x00` | Entry whose type byte was overwritten by the download stamp |
+| Unexpected type or size | Entry header in the last two bytes of a block, followed by a [repeated block](../file-format.md#repeated-blocks); the copy's first byte reads as the type. Gone once repeated blocks are dropped |
