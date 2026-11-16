@@ -9,21 +9,21 @@ One entry per charger.
 | `0x00` | 10 | `bytes[10]` | `name` | Charger name, NUL-padded (e.g. ` 3kW`) |
 | `0x0A` | 2 | `u16` | `status` | Status word. See [status](#status) |
 | `0x0C` | 4 | `u32` | `dc_output_mv` | DC output voltage, mV |
-| `0x10` | 2 | `u16` | `dc_current_a` | DC output current, A. mA in rev 7–15 |
-| `0x12` | 2 | `u16` | `max_charge_current_a` | Maximum charge current, A. mA in rev 7–15 |
+| `0x10` | 2 | `u16` | `dc_current_a` | DC output current, A. mA in rev 6–15 |
+| `0x12` | 2 | `u16` | `max_charge_current_a` | Maximum charge current, A. mA in rev 6–15 |
 | `0x14` | 4 | `u32` | `max_charge_voltage_mv` | Maximum charge voltage, mV |
 | `0x18` | 1 | `u8` | `cmd_in_a` | AC input current limit, A |
 | `0x19` | 1 | `u8` | `charger_variant` | Charger model/firmware code. See [charger_variant](#charger_variant) |
 | `0x1A` | 1 | `u8` | `ac_volts_v` | AC input voltage, V |
-| `0x1B` | 2 | `u16` | `ac_current_a` | AC input current, A. mA in rev 7–15 |
+| `0x1B` | 2 | `u16` | `ac_current_a` | AC input current, A. mA in rev 6–15 |
 | `0x1D` | 1 | `u8` | `ac_hz` | AC frequency, Hz |
-| `0x1E` | 1 | `s8` | `temp_c` | Charger temperature, °C |
+| `0x1E` | 1 | `s8` | `temp_c` | Charger temperature. Encoding by firmware rev, see [temp_c](#temp_c) |
 | `0x1F` | 1 | `u8` | `can_id` | CANopen node ID. `0x10` = first, `0x11` = second |
 | `0x20` | 2 | `u16` | `version` | Charger firmware version |
 | `0x22` | 4 | `u32` | `serial_number` | Charger serial number |
 | `0x26` | 2 | `u16` | `status_code` | Charger type. See [status_code](#status_code) |
 | `0x28` | 4 | `u32` | `setpt_voltage_mv` | Commanded charge voltage, mV |
-| `0x2C` | 2 | `u16` | `setpt_current_a` | Commanded charge current, A. mA in rev 7–15 |
+| `0x2C` | 2 | `u16` | `setpt_current_a` | Commanded charge current, A. mA in rev 6–15 |
 | `0x2E` | 2 | `u16` | `setpt_ac_input_a` | Commanded AC input current limit, A |
 | `0x30` | 1 | `u8` | `en_flag` | Charger enabled |
 
@@ -31,10 +31,12 @@ Firmware rev 7–11: two chargers are logged as one 98-byte entry (two consecuti
 
 | MBB firmware | Current fields |
 |---|---|
-| rev 7–15 | mA |
-| rev 17+ | A |
+| rev 6–15 | mA |
+| rev 16+ | A |
 
 ### status
+
+Bitfield.
 
 | Value | Meaning |
 |---|---|
@@ -42,15 +44,30 @@ Firmware rev 7–11: two chargers are logged as one 98-byte entry (two consecuti
 | `0x0080` | Charging, 220 V AC |
 | `0x0020` | Idle |
 
+Bits `0x0001`, `0x0100`, `0x0200`, `0x1000` and `0x4000` also occur; not decoded.
+
+### temp_c
+
+Decode by the firmware rev that wrote the entry: after a firmware update, follow `0x4E`
+[firmware_updated](events.md#0x4e-firmware_updated), not the log header.
+
+| MBB firmware | Type | °C |
+|---|---|---|
+| rev ≤ 15 | `u8` | raw − 50 |
+| rev 16–19 | `s8` | raw |
+| rev 20–38 | `s8` | raw + 50 |
+| rev 39+ | `s8` | raw |
+
 ### status_code
 
-| Value | Meaning |
+| Value | Charger name |
 |---|---|
-| 9 | 3 kW onboard charger |
-| 10 | 6 kW onboard charger |
-| 17 | Reserved |
-| 28 | Calex charger |
-| 29 | Flat 6 kW charger |
+| 9 | `" 3kW "` (rev 6–11: `"Charger"`) |
+| 10 | `" 6kW "` |
+| 28 | `"Flt 6"` (Calex Flat 6) |
+| 32 | `" 3kWFCC "` |
+| 3400 (`0xD48`) | `" 3kWPWL "` |
+| Other | `" Unk "` |
 
 ### charger_variant
 

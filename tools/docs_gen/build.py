@@ -264,7 +264,7 @@ See [Firmware versions](../firmware.md).
 def core(state_desc='Bike state. See [State](#state)'):
     return [
         F('dc_bus_voltage_mv', 's32', 'Controller DC bus voltage, mV (multiple of 100)'),
-        F('dc_bus_current_ma', 's32', 'Controller DC bus current, mA (multiple of 100). + = discharge'),
+        F('dc_bus_current_ma', 's32', 'Controller DC bus current, mA (multiple of 100); 0.1 mA in rev ≤ 11. + = discharge'),
         F('motor_rpm', 's32', 'Motor speed, rpm (×14/13 applied)'),
         F('soc_pct', 'u8', 'State of charge, %'),
         F('pack_voltage_mv', 'u32', 'Pack voltage, mV'),
@@ -273,14 +273,15 @@ def core(state_desc='Bike state. See [State](#state)'):
     ]
 
 
-ERR = F('error_flags', 'u32', 'Result code. 0 = OK, 2 = no app instance (rev ≤ 11: 1 = reads failed)')
+ERR = F('error_flags', 'u32', 'Result code. 0 = OK, 2 = no app instance. Rev ≤ 11: 1 exactly when `status_flags` ≠ 0 (controller or BMS not reporting)')
 SPEED = F('speed_mm_hr', 's32', 'Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr)')
 RANGE = F('range_km_x100', 'u16', 'Estimated range, km × 100')
+RANGE_OLD = F('range_km_x100', 'u16', 'Estimated range, whole km (not × 100). 0 = not reported')
 
 
-def temps(ambient, only=None):
+def temps(ambient, only=None, flags_desc='Temperature read failures. See [temp_flags](#temp_flags)'):
     return [
-        F('temp_flags', 'u32', 'Temperature read failures. See [temp_flags](#temp_flags)', only),
+        F('temp_flags', 'u32', flags_desc, only),
         F('ambient_c', 's32', f'Ambient temperature, {ambient}. See [ambient_c](#ambient_c)', only),
         F('t1_c', 's32', 'Motor temperature, °C. 0 / −1 = unavailable', only),
         F('t2_c', 's32', 'Controller temperature, °C. 0 / −1 = unavailable', only),
@@ -306,20 +307,23 @@ TAIL2 = [
     F('odometer_km_x10', 'u32', 'Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10)'),
     SPEED,
     RANGE,
-    F('bms_lowest_dis_allow', 'u8', 'Lowest BMS discharge allowance'),
+    F('bms_lowest_dis_allow', 'u8', 'Always 0 from rev 16 (firmware bug). Rev 13–15: coldest pack temperature, °C'),
 ]
 
-P4B = [ERR, F('status_flags', 'u32', 'Validity flags. See [status_flags](#status_flags)')] + core() + [SPEED, RANGE]
+P4B = [ERR, F('status_flags', 'u32', 'Validity flags. See [status_flags](#status_flags)')] + core() + [SPEED, RANGE_OLD]
+UNINIT = 'Uninitialised memory in rev 6–14; not a flag word. See [{0}](#{0})'
+FREEZE_OLD = F('freeze_status', 'u32', UNINIT.format('freeze_status'))
+TEMPS_OLD = temps('°C', flags_desc=UNINIT.format('temp_flags'))
 def odometer(short, long):
     return [F('odometer_low_byte', 'u8', 'Odometer low byte, km × 10', only={short}),
             F('odometer_km_x10', 'u32', 'Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10)', only={long})]
 
 
-P4C = [ERR, F('freeze_status', 'u32', 'See [freeze_status](#freeze_status)'),
-       F('status_flags', 'u32', 'Validity flags. See [status_flags](#status_flags)')] + core() + [SPEED, RANGE] + temps('°C') + COUNTS + odometer('71 B', '74 B')
+P4C = [ERR, FREEZE_OLD,
+       F('status_flags', 'u32', 'Validity flags. See [status_flags](#status_flags)')] + core() + [SPEED, RANGE_OLD] + TEMPS_OLD + COUNTS + odometer('71 B', '74 B')
 P4D = [ERR, F('freeze_med2_err', 'u32', 'Bit 1 = medium snapshot failed. Undefined in rev 6–14'),
-       F('freeze_status', 'u32', 'See [freeze_status](#freeze_status)'),
-       F('status_flags', 'u32', 'Validity flags. See [status_flags](#status_flags)')] + core() + [SPEED, RANGE] + temps('°C') + COUNTS + odometer('83 B', '86 B') + SLOT
+       FREEZE_OLD,
+       F('status_flags', 'u32', 'Validity flags. See [status_flags](#status_flags)')] + core() + [SPEED, RANGE_OLD] + TEMPS_OLD + COUNTS + odometer('83 B', '86 B') + SLOT
 P51 = [ERR, FLAGS2] + core() + temps('°C × 100; °C in rev 18–19') + [dict(BAT12, only={'62 B'})]
 P52 = [ERR, MED2, FLAGS2] + core() + temps('°C × 100; °C in rev 18–19') + [dict(BAT12, only={'79 B'})] + COUNTS + TAIL2
 P53 = [ERR, F('freeze_med2_err', 'u32', 'Read failures. See [freeze_med2_err](#freeze_med2_err)'), MED2, FLAGS2] + core() + temps('°C × 100; °C in rev 18–19') + [
@@ -330,7 +334,7 @@ P53 = [ERR, F('freeze_med2_err', 'u32', 'Read failures. See [freeze_med2_err](#f
 P54 = [
     F('torque_unm', 's32', 'Motor torque, µNm'),
     F('torque_demand_pct_x10', 's32', 'Torque demand, % × 10 (−1000…1000). − = regen'),
-    F('filtered_motor_power_w', 's32', 'Motor power, first-order low-pass filtered, W. 0 at power-on'),
+    F('filtered_motor_power_w', 's32', 'Motor power, first-order low-pass filtered, W. τ = 65,535 s (≈ 18 h) on most bikes, ≈ 500 s on some; with the long τ it rises slowly through a ride (≈ energy / τ) instead of tracking power. 0 at power-on'),
     F('disch_power_limit_w', 's32', 'Discharge power limit, W. −1 = BMS not active'),
 ]
 
@@ -405,7 +409,10 @@ Logged about every 120 s while riding and every 60 min while parked.
        (3, '`motor_rpm` invalid'), (5, '`pack_voltage_mv` invalid'), (6, '`pack_current_ma` invalid'),
        (7, '`state` lookup failed'), (8, 'Temperature block failed'), (9, '`battery_12v` invalid')], 3)}
 
-`0x4B`–`0x4D`: bit 8 (`0x100`) = `speed_mm_hr` invalid. Other bits are not mapped.
+Rev 13–17 write each bit one position higher (bit 0 is never set).
+
+`0x4B`–`0x4D`: not mapped for the firmware that writes them (rev 6–14). Values are `0x00`, `0xF0`,
+`0xF8` and `0xFF`. Bits 0–3 are set when the controller is not reporting (`dc_bus_voltage_mv` = 0).
 
 A zero `dc_bus_current_ma` with bit 1 set means no controller data.
 
@@ -439,9 +446,13 @@ speed, so it does not match `speed_mm_hr` integrated over time.
 {bits([(1, '`ambient_c` read failed'), (2, '`t1_c` read failed'), (3, '`t2_c` read failed'),
        (4, '`bms_high_c` read failed'), (5, '`bms_low_c` read failed')])}
 
+`0x51`–`0x53` rev 13–17 write each bit one position higher. `0x4C`, `0x4D` (rev 6–14): uninitialised memory, not a flag word.
+
 ### freeze_med2_flags
 
-{bits([(1, 'Small snapshot failed'), (5, '`speed_mm_hr` invalid'), (7, '`bms_lowest_dis_allow` invalid')])}
+{bits([(1, 'Small snapshot failed'), (5, '`speed_mm_hr` invalid'), (7, 'No BMS module with contactor closed')])}
+
+Rev 13–17 write each bit one position higher.
 
 ### freeze_med2_err
 
@@ -452,6 +463,8 @@ speed, so it does not match `speed_mm_hr` integrated over time.
 ### freeze_status
 
 {bits([(1, 'Small snapshot failed'), (2, 'Temperature block failed')])}
+
+Rev 6–14: uninitialised memory, not a flag word.
 """)
 
 # status ------------------------------------------------------------------
@@ -540,21 +553,21 @@ P48 = [
     F('name', 'bytes[10]', 'Charger name, NUL-padded (e.g. ` 3kW`)'),
     F('status', 'u16', 'Status word. See [status](#status)'),
     F('dc_output_mv', 'u32', 'DC output voltage, mV'),
-    F('dc_current_a', 'u16', 'DC output current, A. mA in rev 7–15'),
-    F('max_charge_current_a', 'u16', 'Maximum charge current, A. mA in rev 7–15'),
+    F('dc_current_a', 'u16', 'DC output current, A. mA in rev 6–15'),
+    F('max_charge_current_a', 'u16', 'Maximum charge current, A. mA in rev 6–15'),
     F('max_charge_voltage_mv', 'u32', 'Maximum charge voltage, mV'),
     F('cmd_in_a', 'u8', 'AC input current limit, A'),
     F('charger_variant', 'u8', 'Charger model/firmware code. See [charger_variant](#charger_variant)'),
     F('ac_volts_v', 'u8', 'AC input voltage, V'),
-    F('ac_current_a', 'u16', 'AC input current, A. mA in rev 7–15'),
+    F('ac_current_a', 'u16', 'AC input current, A. mA in rev 6–15'),
     F('ac_hz', 'u8', 'AC frequency, Hz'),
-    F('temp_c', 's8', 'Charger temperature, °C'),
+    F('temp_c', 's8', 'Charger temperature. Encoding by firmware rev, see [temp_c](#temp_c)'),
     F('can_id', 'u8', 'CANopen node ID. `0x10` = first, `0x11` = second'),
     F('version', 'u16', 'Charger firmware version'),
     F('serial_number', 'u32', 'Charger serial number'),
     F('status_code', 'u16', 'Charger type. See [status_code](#status_code)'),
     F('setpt_voltage_mv', 'u32', 'Commanded charge voltage, mV'),
-    F('setpt_current_a', 'u16', 'Commanded charge current, A. mA in rev 7–15'),
+    F('setpt_current_a', 'u16', 'Commanded charge current, A. mA in rev 6–15'),
     F('setpt_ac_input_a', 'u16', 'Commanded AC input current limit, A'),
     F('en_flag', 'u8', 'Charger enabled'),
 ]
@@ -585,16 +598,32 @@ Firmware rev 7–11: two chargers are logged as one 98-byte entry (two consecuti
 
 | MBB firmware | Current fields |
 |---|---|
-| rev 7–15 | mA |
-| rev 17+ | A |
+| rev 6–15 | mA |
+| rev 16+ | A |
 
 ### status
 
+Bitfield.
+
 {values([('`0x0480`', 'Charging, 110 V AC'), ('`0x0080`', 'Charging, 220 V AC'), ('`0x0020`', 'Idle')])}
+
+Bits `0x0001`, `0x0100`, `0x0200`, `0x1000` and `0x4000` also occur; not decoded.
+
+### temp_c
+
+Decode by the firmware rev that wrote the entry: after a firmware update, follow `0x4E`
+[firmware_updated](events.md#0x4e-firmware_updated), not the log header.
+
+| MBB firmware | Type | °C |
+|---|---|---|
+| rev ≤ 15 | `u8` | raw − 50 |
+| rev 16–19 | `s8` | raw |
+| rev 20–38 | `s8` | raw + 50 |
+| rev 39+ | `s8` | raw |
 
 ### status_code
 
-{values([(9, '3 kW onboard charger'), (10, '6 kW onboard charger'), (17, 'Reserved'), (28, 'Calex charger'), (29, 'Flat 6 kW charger')])}
+{values([(9, '`" 3kW "` (rev 6–11: `"Charger"`)'), (10, '`" 6kW "`'), (28, '`"Flt 6"` (Calex Flat 6)'), (32, '`" 3kWFCC "`'), ('3400 (`0xD48`)', '`" 3kWPWL "`'), ('Other', '`" Unk "`')], ('Value', 'Charger name'))}
 
 ### charger_variant
 
@@ -914,14 +943,14 @@ B4E = [
     F('est_disch_mwh', 'u32', 'Estimated discharge, mWh'),
     F('ideal_pack_cap_mah', 'u32', 'Ideal (new) pack capacity, mAh'),
     F('ideal_pack_cap_mwh', 'u32', 'Ideal (new) pack capacity, mWh'),
-    F('reserved_zero_a', 's32', 'Always 0'),
+    F('reserved_zero_a', 's32', '0 in MY22 BMU; non-zero, undecoded, in MY19 BMS fw 18'),
     F('reserved_zero_b', 's32', 'Always 0'),
     F('reserved_zero_c', 'u32', 'Always 0'),
     F('measured_cell_impedance_uohm', 'u32', 'Measured cell impedance, µΩ. 0 = not yet measured'),
     F('estimated_cell_sag_mv', 's16', 'Estimated cell sag under load, mV'),
     F('measured_cell_sag_mv', 's16', 'Measured cell sag, mV'),
-    F('zero_b', 's16', 'Always 0'),
-    F('reserved_zero_d', 's32', 'Always 0'),
+    F('zero_b', 's16', '0 in MY22 BMU; non-zero, undecoded, in MY19 BMS fw 18'),
+    F('reserved_zero_d', 's32', '0 in MY22 BMU; non-zero, undecoded, in MY19 BMS fw 18'),
 ]
 
 PIO_BMU = [
@@ -966,8 +995,8 @@ page('bms/periodic.md', f"""
 
 | Variant | Firmware |
 |---|---|
-| 33 / 49 / 57 | 2019–20 SR/F (BMS rev 8, 9, 11) |
-| 37 / 55 / 63 | BMU rev 3–5 |
+| 33 / 49 / 57 | 2019–20 SR/F: MY19 BMS `40-08184` rev 8, 9, 11; `40-08201` rev 11 |
+| 37 / 55 / 63 | BMU rev 3–5; MY19 BMS `40-08184` rev 13+, `40-08201` rev 14+ |
 | 39 / 57 / 65 | BMU rev 17+ |
 
 ## 0x4B -- periodic_small
@@ -1012,7 +1041,8 @@ reduced-reporting state; `soc_pct` and `pack_current_ma` then read 0.
 
 ### bms_faults
 
-Only bits 0–7 are written; bytes 1–7 are always 0.
+Only bits 0–7 are written; bytes 1–7 are always 0. Non-zero high bytes in 2019–20 33-byte entries
+are text from repeated `ZERO_BMS_STATE` blocks in the download, not fault bits.
 
 {bits([(0, 'Logging'), (1, 'Precharge'), (2, 'Contactor'), (3, 'Charge'), (4, 'Discharge'),
        (5, 'Current sensor'), (6, 'Temperature sensor'), (7, 'Temperature sensor alert')])}
@@ -1197,7 +1227,7 @@ B7D = [
     F('dynamic_discharge_current_limit_a', 's16', 'Dynamic discharge current limit, A'),
     F('static_charge_current_limit_a', 's16', 'Static charge current limit, A'),
     F('dynamic_charge_current_limit_a', 's16', 'Dynamic charge current limit, A'),
-    F('pack_current_a', 's16', 'Pack current, A'),
+    F('pack_current_a', 's16', 'Pack current. A in MY22 BMU; mA in MY19 BMS fw 18'),
     F('soc_pct', 'u8', 'State of charge, %'),
     F('lowest_cell_mv', 's16', 'Lowest unloaded cell voltage, mV'),
     F('highest_cell_mv', 's16', 'Highest unloaded cell voltage, mV'),
@@ -1251,7 +1281,7 @@ page('bms/cell-data.md', f"""
 
 {table(B84, [('2 B', 2), ('3 B', 3)])}
 
-3-byte variant: BMU rev 17+.
+3-byte variant: BMU rev 13+ (`40-08247`). MY19 BMS (`40-08201`) writes 2 bytes through rev 26.
 
 ## 0x86 – 0x89 -- cell temperature limits
 

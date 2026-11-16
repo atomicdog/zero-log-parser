@@ -9,8 +9,8 @@
 
 | Variant | Firmware |
 |---|---|
-| 33 / 49 / 57 | 2019–20 SR/F (BMS rev 8, 9, 11) |
-| 37 / 55 / 63 | BMU rev 3–5 |
+| 33 / 49 / 57 | 2019–20 SR/F: MY19 BMS `40-08184` rev 8, 9, 11; `40-08201` rev 11 |
+| 37 / 55 / 63 | BMU rev 3–5; MY19 BMS `40-08184` rev 13+, `40-08201` rev 14+ |
 | 39 / 57 / 65 | BMU rev 17+ |
 
 ## 0x4B -- periodic_small
@@ -121,14 +121,14 @@ Logged while charging.
 | `0x33` | 4 | `u32` | `est_disch_mwh` | Estimated discharge, mWh |
 | `0x37` | 4 | `u32` | `ideal_pack_cap_mah` | Ideal (new) pack capacity, mAh |
 | `0x3B` | 4 | `u32` | `ideal_pack_cap_mwh` | Ideal (new) pack capacity, mWh |
-| `0x3F` | 4 | `s32` | `reserved_zero_a` | Always 0 |
+| `0x3F` | 4 | `s32` | `reserved_zero_a` | 0 in MY22 BMU; non-zero, undecoded, in MY19 BMS fw 18 |
 | `0x43` | 4 | `s32` | `reserved_zero_b` | Always 0 |
 | `0x47` | 4 | `u32` | `reserved_zero_c` | Always 0 |
 | `0x4B` | 4 | `u32` | `measured_cell_impedance_uohm` | Measured cell impedance, µΩ. 0 = not yet measured |
 | `0x4F` | 2 | `s16` | `estimated_cell_sag_mv` | Estimated cell sag under load, mV |
 | `0x51` | 2 | `s16` | `measured_cell_sag_mv` | Measured cell sag, mV |
-| `0x53` | 2 | `s16` | `zero_b` | Always 0 |
-| `0x55` | 4 | `s32` | `reserved_zero_d` | Always 0 |
+| `0x53` | 2 | `s16` | `zero_b` | 0 in MY22 BMU; non-zero, undecoded, in MY19 BMS fw 18 |
+| `0x55` | 4 | `s32` | `reserved_zero_d` | 0 in MY22 BMU; non-zero, undecoded, in MY19 BMS fw 18 |
 
 ## Field definitions
 
@@ -154,7 +154,8 @@ reduced-reporting state; `soc_pct` and `pack_current_ma` then read 0.
 
 ### bms_faults
 
-Only bits 0–7 are written; bytes 1–7 are always 0.
+Only bits 0–7 are written; bytes 1–7 are always 0. Non-zero high bytes in 2019–20 33-byte entries
+are text from repeated `ZERO_BMS_STATE` blocks in the download, not fault bits.
 
 | Bit | Mask | Meaning |
 |---|---|---|

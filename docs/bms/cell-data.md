@@ -24,7 +24,7 @@
 | `0x02` | 2 | `s16` | `dynamic_discharge_current_limit_a` | Dynamic discharge current limit, A |
 | `0x04` | 2 | `s16` | `static_charge_current_limit_a` | Static charge current limit, A |
 | `0x06` | 2 | `s16` | `dynamic_charge_current_limit_a` | Dynamic charge current limit, A |
-| `0x08` | 2 | `s16` | `pack_current_a` | Pack current, A |
+| `0x08` | 2 | `s16` | `pack_current_a` | Pack current. A in MY22 BMU; mA in MY19 BMS fw 18 |
 | `0x0A` | 1 | `u8` | `soc_pct` | State of charge, % |
 | `0x0B` | 2 | `s16` | `lowest_cell_mv` | Lowest unloaded cell voltage, mV |
 | `0x0D` | 2 | `s16` | `highest_cell_mv` | Highest unloaded cell voltage, mV |
@@ -43,7 +43,7 @@
 | `0x00` | `0x00` | 2 | `s16` | `cell_mv` | `0x84`: lowest, `0x85`: highest unloaded cell voltage, mV |
 | — | `0x02` | 1 | `u8` | `trigger_cell_index` | Trigger cell, 0–27. `0xFF` = unavailable |
 
-3-byte variant: BMU rev 17+.
+3-byte variant: BMU rev 13+ (`40-08247`). MY19 BMS (`40-08201`) writes 2 bytes through rev 26.
 
 ## 0x86 – 0x89 -- cell temperature limits
 
