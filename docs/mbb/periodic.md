@@ -224,7 +224,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 Rev 13–17 write each bit one position higher (bit 0 is never set).
 
 `0x4B`–`0x4D`: not mapped for the firmware that writes them (rev 6–14). Values are `0x00`, `0xF0`,
-`0xF8` and `0xFF`. Bits 0–3 are set when the controller is not reporting (`dc_bus_voltage_mv` = 0).
+`0xF8` and `0xFF`. Bits 0–2 = controller not reporting (`dc_bus_voltage_mv` = 0). Bit 3 and bits 4–7 are not mapped.
 
 A zero `dc_bus_current_ma` with bit 1 set means no controller data.
 
