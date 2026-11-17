@@ -292,7 +292,7 @@ def temps(ambient, only=None, flags_desc='Temperature read failures. See [temp_f
 
 BAT12 = F('battery_12v', 'u32', '12 V battery voltage, µV', only={'62 B', '79 B', '93 B'})
 COUNTS = [
-    F('num_can_modules', 'u8', 'BMS modules on CAN'),
+    F('num_can_modules', 'u8', 'BMS modules on CAN. 2 with a second pack ([`FST Mod`](../bms/index.md#pack-model))'),
     F('num_contactors_closed', 'u8', 'Contactors closed'),
 ]
 SLOT = [
@@ -752,8 +752,8 @@ See [Log header](index.md#log-header-0xfb).
 
 BMS_HEADER = ENTRY_HEADER + [
     F('device_name', 'char[10]', '`BMS`'),
-    F('module_model', 'char[16]', 'Module model (e.g. `FST BCB`)'),
-    F('num_parallel_cells', 'u8', 'Cells in parallel per series group'),
+    F('module_model', 'char[16]', 'Pack model: `FST Mono`, `FST BCB` or `FST Mod`. See [Pack model](#pack-model)'),
+    F('num_parallel_cells', 'u8', 'Cells in parallel per series group: 4, 2 or 1 by [pack model](#pack-model)'),
     F('board_part', 'char[16]', 'Board part number (e.g. `40-08295-01`)'),
     F('serial', 'char[16]', 'BMS serial number'),
     F('bcbm_id', 'char[16]', 'BCBM identifier (e.g. `BCBM0000`)'),
@@ -849,6 +849,23 @@ Entry offsets (equal to file offsets once the entry is un-escaped).
 download damage: the header is rebuilt for each 7-byte CAN segment, so an escape present in
 only some segments loses or shifts bytes. Fields otherwise keep this layout. The missing
 byte is usually raw offset 14.
+
+### Pack model
+
+All packs have 28 cells in series.
+
+| `module_model` | `num_parallel_cells` | BMS firmware (`fw_part`) | Capacity |
+|---|---|---|---|
+| `FST Mono` | 4 | MY19 BMS `75-08156` | ≈ 115 Ah new (`ideal_pack_cap_mah`) |
+| `FST BCB` | 2 | MY22 BMU `75-08274`, `75-08384` | ≈ 140 Ah (`est_pack_cap_mah`) |
+| `FST Mod` | 1 | MY19 BMS `75-08156` | 21–29 Ah (`est_pack_cap_mah`) |
+
+`FST Mod` is a second, quarter-size pack beside the main pack (`FST Mono` or `FST BCB`). Its
+log is a separate BMS log. With it fitted, the MBB reports `num_can_modules` = 2.
+
+MY19 BMS firmware also defines `FST Long`, not seen in logs.
+
+A header torn during download can repeat a character: `FST MMono`, `FST MMod`, `FST BBCB`.
 
 ### Board variants
 

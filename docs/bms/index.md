@@ -14,8 +14,8 @@ Entry offsets (equal to file offsets once the entry is un-escaped).
 | `0x0B` | 1 | `u8` | `count` | Rolling entry counter |
 | `0x0C` | 1 | `s8` | `utc_offset` | UTC offset, hours |
 | `0x0D` | 10 | `char[10]` | `device_name` | `BMS` |
-| `0x17` | 16 | `char[16]` | `module_model` | Module model (e.g. `FST BCB`) |
-| `0x27` | 1 | `u8` | `num_parallel_cells` | Cells in parallel per series group |
+| `0x17` | 16 | `char[16]` | `module_model` | Pack model: `FST Mono`, `FST BCB` or `FST Mod`. See [Pack model](#pack-model) |
+| `0x27` | 1 | `u8` | `num_parallel_cells` | Cells in parallel per series group: 4, 2 or 1 by [pack model](#pack-model) |
 | `0x28` | 16 | `char[16]` | `board_part` | Board part number (e.g. `40-08295-01`) |
 | `0x38` | 16 | `char[16]` | `serial` | BMS serial number |
 | `0x48` | 16 | `char[16]` | `bcbm_id` | BCBM identifier (e.g. `BCBM0000`) |
@@ -29,6 +29,23 @@ Entry offsets (equal to file offsets once the entry is un-escaped).
 download damage: the header is rebuilt for each 7-byte CAN segment, so an escape present in
 only some segments loses or shifts bytes. Fields otherwise keep this layout. The missing
 byte is usually raw offset 14.
+
+### Pack model
+
+All packs have 28 cells in series.
+
+| `module_model` | `num_parallel_cells` | BMS firmware (`fw_part`) | Capacity |
+|---|---|---|---|
+| `FST Mono` | 4 | MY19 BMS `75-08156` | ≈ 115 Ah new (`ideal_pack_cap_mah`) |
+| `FST BCB` | 2 | MY22 BMU `75-08274`, `75-08384` | ≈ 140 Ah (`est_pack_cap_mah`) |
+| `FST Mod` | 1 | MY19 BMS `75-08156` | 21–29 Ah (`est_pack_cap_mah`) |
+
+`FST Mod` is a second, quarter-size pack beside the main pack (`FST Mono` or `FST BCB`). Its
+log is a separate BMS log. With it fitted, the MBB reports `num_can_modules` = 2.
+
+MY19 BMS firmware also defines `FST Long`, not seen in logs.
+
+A header torn during download can repeat a character: `FST MMono`, `FST MMod`, `FST BBCB`.
 
 ### Board variants
 

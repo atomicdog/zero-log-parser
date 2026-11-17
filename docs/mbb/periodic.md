@@ -50,7 +50,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x38` | `0x38` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
 | `0x3C` | `0x3C` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
 | `0x40` | `0x40` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
-| `0x44` | `0x44` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
+| `0x44` | `0x44` | 1 | `u8` | `num_can_modules` | BMS modules on CAN. 2 with a second pack ([`FST Mod`](../bms/index.md#pack-model)) |
 | `0x45` | `0x45` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
 | `0x46` | — | 1 | `u8` | `odometer_low_byte` | Odometer low byte, km × 10 |
 | — | `0x46` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
@@ -80,7 +80,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x3C` | `0x3C` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
 | `0x40` | `0x40` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
 | `0x44` | `0x44` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
-| `0x48` | `0x48` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
+| `0x48` | `0x48` | 1 | `u8` | `num_can_modules` | BMS modules on CAN. 2 with a second pack ([`FST Mod`](../bms/index.md#pack-model)) |
 | `0x49` | `0x49` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
 | `0x4A` | — | 1 | `u8` | `odometer_low_byte` | Odometer low byte, km × 10 |
 | — | `0x4A` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
@@ -133,7 +133,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x36` | `0x36` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
 | `0x3A` | `0x3A` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
 | — | `0x3E` | 4 | `u32` | `battery_12v` | 12 V battery voltage, µV |
-| `0x3E` | `0x42` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
+| `0x3E` | `0x42` | 1 | `u8` | `num_can_modules` | BMS modules on CAN. 2 with a second pack ([`FST Mod`](../bms/index.md#pack-model)) |
 | `0x3F` | `0x43` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
 | `0x40` | `0x44` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
 | `0x44` | `0x48` | 4 | `s32` | `speed_mm_hr` | Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr) |
@@ -162,7 +162,7 @@ Logged about every 120 s while riding and every 60 min while parked.
 | `0x3A` | `0x3A` | `0x3A` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
 | `0x3E` | `0x3E` | `0x3E` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
 | — | — | `0x42` | 4 | `u32` | `battery_12v` | 12 V battery voltage, µV |
-| `0x42` | `0x42` | `0x46` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
+| `0x42` | `0x42` | `0x46` | 1 | `u8` | `num_can_modules` | BMS modules on CAN. 2 with a second pack ([`FST Mod`](../bms/index.md#pack-model)) |
 | `0x43` | `0x43` | `0x47` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
 | `0x44` | `0x44` | `0x48` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
 | `0x48` | `0x48` | `0x4C` | 4 | `s32` | `speed_mm_hr` | Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr) |
