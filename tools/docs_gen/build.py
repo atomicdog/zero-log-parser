@@ -231,7 +231,7 @@ MBB_TYPES = values([
     ('`0x50`', '`mcu_fault`', '25', 'MCU fault registers', '[Faults](faults.md#0x50-mcu_fault)'),
     ('`0x51`', '`periodic_small2`', '62 / 58', 'Periodic snapshot, small', '[Periodic](periodic.md#0x51-periodic_small2)'),
     ('`0x52`', '`periodic_medium2`', '79 / 75', 'Periodic snapshot, medium', '[Periodic](periodic.md#0x52-periodic_medium2)'),
-    ('`0x53`', '`periodic_large2`', '93 / 89', 'Periodic snapshot, large', '[Periodic](periodic.md#0x53-periodic_large2)'),
+    ('`0x53`', '`periodic_large2`', '93 / 89 / 87', 'Periodic snapshot, large', '[Periodic](periodic.md#0x53-periodic_large2)'),
     ('`0x54`', '`torque_info`', '16', 'Torque and power snapshot', '[Periodic](periodic.md#0x54-torque_info)'),
     ('`0xFB`', '`log_header`', '104', 'Log header (first entry of the file)', '[Log header](#log-header-0xfb)'),
     ('`0xFD`', '`debug_message`', '≤ 115', 'Text message', '[Events](events.md#0xfd-debug_message)'),
@@ -328,8 +328,8 @@ P51 = [ERR, FLAGS2] + core() + temps('°C × 100; °C in rev 18–19') + [dict(B
 P52 = [ERR, MED2, FLAGS2] + core() + temps('°C × 100; °C in rev 18–19') + [dict(BAT12, only={'79 B'})] + COUNTS + TAIL2
 P53 = [ERR, F('freeze_med2_err', 'u32', 'Read failures. See [freeze_med2_err](#freeze_med2_err)'), MED2, FLAGS2] + core() + temps('°C × 100; °C in rev 18–19') + [
     dict(BAT12, only={'93 B'})] + COUNTS + TAIL2 + SLOT + [
-    F('bms_avg_dis_allow', 'u8', 'Average BMS discharge allowance'),
-    F('bms_avg_chg_allow', 'u8', 'Average BMS charge allowance'),
+    F('bms_avg_dis_allow', 'u8', 'Average BMS discharge allowance', only={'89 B', '93 B'}),
+    F('bms_avg_chg_allow', 'u8', 'Average BMS charge allowance', only={'89 B', '93 B'}),
 ]
 P54 = [
     F('torque_unm', 's32', 'Motor torque, µNm'),
@@ -356,7 +356,7 @@ page('mbb/periodic.md', f"""
 | `0x4D` | `periodic_large` | 83 / 86 |
 | `0x51` | `periodic_small2` | 58 / 62 |
 | `0x52` | `periodic_medium2` | 75 / 79 |
-| `0x53` | `periodic_large2` | 89 / 93 |
+| `0x53` | `periodic_large2` | 87 / 89 / 93 |
 | `0x54` | `torque_info` | 16 |
 
 Logged about every 120 s while riding and every 60 min while parked.
@@ -387,7 +387,9 @@ Logged about every 120 s while riding and every 60 min while parked.
 
 ## 0x53 -- periodic_large2
 
-{table(P53, [('89 B', 89), ('93 B', 93)])}
+{table(P53, [('87 B', 87), ('89 B', 89), ('93 B', 93)])}
+
+87 bytes: firmware rev 13–15.
 
 ## 0x54 -- torque_info
 
@@ -400,6 +402,8 @@ Logged about every 120 s while riding and every 60 min while parked.
 5-byte NUL-padded ASCII. Empty when the lookup failed (`status_flags` bit 7).
 
 {STATES}
+
+`LIMP` follows a fault, such as `KEY_OFF_WHILE_MOVING` or `12V_COMBINED_LVW`, and is followed by `STOP`.
 
 ### status_flags
 
@@ -1056,8 +1060,23 @@ reduced-reporting state; `soc_pct` and `pack_current_ma` then read 0.
 Only bits 0–7 are written; bytes 1–7 are always 0. Non-zero high bytes in 2019–20 33-byte entries
 are text from repeated `ZERO_BMS_STATE` blocks in the download, not fault bits.
 
-{bits([(0, 'Logging'), (1, 'Precharge'), (2, 'Contactor'), (3, 'Charge'), (4, 'Discharge'),
-       (5, 'Current sensor'), (6, 'Temperature sensor'), (7, 'Temperature sensor alert')])}
+{bits([(0, 'Logging: an event-log write failed (write pointer out of range or not saved, read pointer '
+           'invalid and rescan failed, flash write failed, or entry over 128 bytes). Clears itself, '
+           'typically within 1–2 s'),
+       (1, 'Precharge'),
+       (2, 'Contactor. Set and cleared with [`cont_fault`](faults.md#0x55-cont_fault) / `cont_fault_clr`'),
+       (3, 'Charge. Set with [`chg_fault`](faults.md#0x65-0x66-chg_fault)'),
+       (4, 'Discharge'),
+       (5, 'Current sensor. Set with [`cur_sense`](diagnostics.md#0x6b-0x6c-cur_sense)'),
+       (6, 'Temperature sensor. Set with [`temp_sen`](diagnostics.md#0x6e-0x6f-temp_sen)'),
+       (7, 'Temperature sensor alert')])}
+
+A reboot clears the contactor bit without a `cont_fault_clr` entry.
+
+Byte 0 = `0x0E` (MY19 BMS) or `0x01` (BMU) in an entry one byte longer than the file's usual
+length is download damage, not a fault: the [download stamp](../file-format.md#bms-download-stamp)
+removed an escape, every field reads one byte early, and the top byte of
+`pack_io_control_flags` lands in byte 0.
 
 ### pack_io_control_flags
 

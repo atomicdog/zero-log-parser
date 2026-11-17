@@ -171,14 +171,21 @@ are text from repeated `ZERO_BMS_STATE` blocks in the download, not fault bits.
 
 | Bit | Mask | Meaning |
 |---|---|---|
-| 0 | `0x01` | Logging |
+| 0 | `0x01` | Logging: an event-log write failed (write pointer out of range or not saved, read pointer invalid and rescan failed, flash write failed, or entry over 128 bytes). Clears itself, typically within 1–2 s |
 | 1 | `0x02` | Precharge |
-| 2 | `0x04` | Contactor |
-| 3 | `0x08` | Charge |
+| 2 | `0x04` | Contactor. Set and cleared with [`cont_fault`](faults.md#0x55-cont_fault) / `cont_fault_clr` |
+| 3 | `0x08` | Charge. Set with [`chg_fault`](faults.md#0x65-0x66-chg_fault) |
 | 4 | `0x10` | Discharge |
-| 5 | `0x20` | Current sensor |
-| 6 | `0x40` | Temperature sensor |
+| 5 | `0x20` | Current sensor. Set with [`cur_sense`](diagnostics.md#0x6b-0x6c-cur_sense) |
+| 6 | `0x40` | Temperature sensor. Set with [`temp_sen`](diagnostics.md#0x6e-0x6f-temp_sen) |
 | 7 | `0x80` | Temperature sensor alert |
+
+A reboot clears the contactor bit without a `cont_fault_clr` entry.
+
+Byte 0 = `0x0E` (MY19 BMS) or `0x01` (BMU) in an entry one byte longer than the file's usual
+length is download damage, not a fault: the [download stamp](../file-format.md#bms-download-stamp)
+removed an escape, every field reads one byte early, and the top byte of
+`pack_io_control_flags` lands in byte 0.
 
 ### pack_io_control_flags
 

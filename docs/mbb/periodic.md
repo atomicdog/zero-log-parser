@@ -7,7 +7,7 @@
 | `0x4D` | `periodic_large` | 83 / 86 |
 | `0x51` | `periodic_small2` | 58 / 62 |
 | `0x52` | `periodic_medium2` | 75 / 79 |
-| `0x53` | `periodic_large2` | 89 / 93 |
+| `0x53` | `periodic_large2` | 87 / 89 / 93 |
 | `0x54` | `torque_info` | 16 |
 
 Logged about every 120 s while riding and every 60 min while parked.
@@ -142,38 +142,40 @@ Logged about every 120 s while riding and every 60 min while parked.
 
 ## 0x53 -- periodic_large2
 
-| Offset<br>89 B | Offset<br>93 B | Size | Type | Field | Description |
-|---|---|---|---|---|---|
-| `0x00` | `0x00` | 4 | `u32` | `error_flags` | Result code. 0 = OK, 2 = no app instance. Rev ≤ 11: 1 exactly when `status_flags` ≠ 0 (controller or BMS not reporting) |
-| `0x04` | `0x04` | 4 | `u32` | `freeze_med2_err` | Read failures. See [freeze_med2_err](#freeze_med2_err) |
-| `0x08` | `0x08` | 4 | `u32` | `freeze_med2_flags` | Validity flags. See [freeze_med2_flags](#freeze_med2_flags) |
-| `0x0C` | `0x0C` | 4 | `u32` | `status_flags` | Validity flags. See [status_flags](#status_flags) |
-| `0x10` | `0x10` | 4 | `s32` | `dc_bus_voltage_mv` | Controller DC bus voltage, mV (multiple of 100) |
-| `0x14` | `0x14` | 4 | `s32` | `dc_bus_current_ma` | Controller DC bus current, mA (multiple of 100); 0.1 mA in rev ≤ 11. + = discharge |
-| `0x18` | `0x18` | 4 | `s32` | `motor_rpm` | Motor speed, rpm (×14/13 applied) |
-| `0x1C` | `0x1C` | 1 | `u8` | `soc_pct` | State of charge, % |
-| `0x1D` | `0x1D` | 4 | `u32` | `pack_voltage_mv` | Pack voltage, mV |
-| `0x21` | `0x21` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
-| `0x25` | `0x25` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
-| `0x2A` | `0x2A` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
-| `0x2E` | `0x2E` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100; °C in rev 18–19. See [ambient_c](#ambient_c) |
-| `0x32` | `0x32` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
-| `0x36` | `0x36` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
-| `0x3A` | `0x3A` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
-| `0x3E` | `0x3E` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
-| — | `0x42` | 4 | `u32` | `battery_12v` | 12 V battery voltage, µV |
-| `0x42` | `0x46` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
-| `0x43` | `0x47` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
-| `0x44` | `0x48` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
-| `0x48` | `0x4C` | 4 | `s32` | `speed_mm_hr` | Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr) |
-| `0x4C` | `0x50` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
-| `0x4E` | `0x52` | 1 | `u8` | `bms_lowest_dis_allow` | Always 0 from rev 16 (firmware bug). Rev 13–15: coldest pack temperature, °C |
-| `0x4F` | `0x53` | 1 | `u8` | `controller_fault_code` | Motor controller fault code. 0 = none |
-| `0x50` | `0x54` | 1 | `u8` | `pack_index` | BMS slot of the next two fields (0) |
-| `0x51` | `0x55` | 4 | `u32` | `module_status_bits` | Status bits of that slot. See [module_status_bits](status.md#module_status_bits) |
-| `0x55` | `0x59` | 2 | `u16` | `capacity_ah` | Capacity of that slot, Ah |
-| `0x57` | `0x5B` | 1 | `u8` | `bms_avg_dis_allow` | Average BMS discharge allowance |
-| `0x58` | `0x5C` | 1 | `u8` | `bms_avg_chg_allow` | Average BMS charge allowance |
+| Offset<br>87 B | Offset<br>89 B | Offset<br>93 B | Size | Type | Field | Description |
+|---|---|---|---|---|---|---|
+| `0x00` | `0x00` | `0x00` | 4 | `u32` | `error_flags` | Result code. 0 = OK, 2 = no app instance. Rev ≤ 11: 1 exactly when `status_flags` ≠ 0 (controller or BMS not reporting) |
+| `0x04` | `0x04` | `0x04` | 4 | `u32` | `freeze_med2_err` | Read failures. See [freeze_med2_err](#freeze_med2_err) |
+| `0x08` | `0x08` | `0x08` | 4 | `u32` | `freeze_med2_flags` | Validity flags. See [freeze_med2_flags](#freeze_med2_flags) |
+| `0x0C` | `0x0C` | `0x0C` | 4 | `u32` | `status_flags` | Validity flags. See [status_flags](#status_flags) |
+| `0x10` | `0x10` | `0x10` | 4 | `s32` | `dc_bus_voltage_mv` | Controller DC bus voltage, mV (multiple of 100) |
+| `0x14` | `0x14` | `0x14` | 4 | `s32` | `dc_bus_current_ma` | Controller DC bus current, mA (multiple of 100); 0.1 mA in rev ≤ 11. + = discharge |
+| `0x18` | `0x18` | `0x18` | 4 | `s32` | `motor_rpm` | Motor speed, rpm (×14/13 applied) |
+| `0x1C` | `0x1C` | `0x1C` | 1 | `u8` | `soc_pct` | State of charge, % |
+| `0x1D` | `0x1D` | `0x1D` | 4 | `u32` | `pack_voltage_mv` | Pack voltage, mV |
+| `0x21` | `0x21` | `0x21` | 4 | `s32` | `pack_current_ma` | Pack current, mA. + = discharge, − = charge/regen |
+| `0x25` | `0x25` | `0x25` | 5 | `char[5]` | `state` | Bike state. See [State](#state) |
+| `0x2A` | `0x2A` | `0x2A` | 4 | `u32` | `temp_flags` | Temperature read failures. See [temp_flags](#temp_flags) |
+| `0x2E` | `0x2E` | `0x2E` | 4 | `s32` | `ambient_c` | Ambient temperature, °C × 100; °C in rev 18–19. See [ambient_c](#ambient_c) |
+| `0x32` | `0x32` | `0x32` | 4 | `s32` | `t1_c` | Motor temperature, °C. 0 / −1 = unavailable |
+| `0x36` | `0x36` | `0x36` | 4 | `s32` | `t2_c` | Controller temperature, °C. 0 / −1 = unavailable |
+| `0x3A` | `0x3A` | `0x3A` | 4 | `s32` | `bms_high_c` | Highest cell temperature, °C. −1 = unavailable |
+| `0x3E` | `0x3E` | `0x3E` | 4 | `s32` | `bms_low_c` | Lowest cell temperature, °C. −1 = unavailable |
+| — | — | `0x42` | 4 | `u32` | `battery_12v` | 12 V battery voltage, µV |
+| `0x42` | `0x42` | `0x46` | 1 | `u8` | `num_can_modules` | BMS modules on CAN |
+| `0x43` | `0x43` | `0x47` | 1 | `u8` | `num_contactors_closed` | Contactors closed |
+| `0x44` | `0x44` | `0x48` | 4 | `u32` | `odometer_km_x10` | Odometer, km × 10. See [odometer_km_x10](#odometer_km_x10) |
+| `0x48` | `0x48` | `0x4C` | 4 | `s32` | `speed_mm_hr` | Rear wheel speed, mm/h (÷ 10⁶ = km/h). See [speed_mm_hr](#speed_mm_hr) |
+| `0x4C` | `0x4C` | `0x50` | 2 | `u16` | `range_km_x100` | Estimated range, km × 100 |
+| `0x4E` | `0x4E` | `0x52` | 1 | `u8` | `bms_lowest_dis_allow` | Always 0 from rev 16 (firmware bug). Rev 13–15: coldest pack temperature, °C |
+| `0x4F` | `0x4F` | `0x53` | 1 | `u8` | `controller_fault_code` | Motor controller fault code. 0 = none |
+| `0x50` | `0x50` | `0x54` | 1 | `u8` | `pack_index` | BMS slot of the next two fields (0) |
+| `0x51` | `0x51` | `0x55` | 4 | `u32` | `module_status_bits` | Status bits of that slot. See [module_status_bits](status.md#module_status_bits) |
+| `0x55` | `0x55` | `0x59` | 2 | `u16` | `capacity_ah` | Capacity of that slot, Ah |
+| — | `0x57` | `0x5B` | 1 | `u8` | `bms_avg_dis_allow` | Average BMS discharge allowance |
+| — | `0x58` | `0x5C` | 1 | `u8` | `bms_avg_chg_allow` | Average BMS charge allowance |
+
+87 bytes: firmware rev 13–15.
 
 ## 0x54 -- torque_info
 
@@ -205,6 +207,8 @@ Logged about every 120 s while riding and every 60 min while parked.
 | 10 | `FWUP` | Firmware update |
 | 11 | `REV` | Reverse |
 | 12 | `PARK` | Park |
+
+`LIMP` follows a fault, such as `KEY_OFF_WHILE_MOVING` or `12V_COMBINED_LVW`, and is followed by `STOP`.
 
 ### status_flags
 

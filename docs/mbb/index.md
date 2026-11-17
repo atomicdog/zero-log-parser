@@ -46,7 +46,7 @@ Entry offsets (equal to file offsets once the entry is un-escaped).
 | `0x50` | `mcu_fault` | 25 | MCU fault registers | [Faults](faults.md#0x50-mcu_fault) |
 | `0x51` | `periodic_small2` | 62 / 58 | Periodic snapshot, small | [Periodic](periodic.md#0x51-periodic_small2) |
 | `0x52` | `periodic_medium2` | 79 / 75 | Periodic snapshot, medium | [Periodic](periodic.md#0x52-periodic_medium2) |
-| `0x53` | `periodic_large2` | 93 / 89 | Periodic snapshot, large | [Periodic](periodic.md#0x53-periodic_large2) |
+| `0x53` | `periodic_large2` | 93 / 89 / 87 | Periodic snapshot, large | [Periodic](periodic.md#0x53-periodic_large2) |
 | `0x54` | `torque_info` | 16 | Torque and power snapshot | [Periodic](periodic.md#0x54-torque_info) |
 | `0xFB` | `log_header` | 104 | Log header (first entry of the file) | [Log header](#log-header-0xfb) |
 | `0xFD` | `debug_message` | ≤ 115 | Text message | [Events](events.md#0xfd-debug_message) |
